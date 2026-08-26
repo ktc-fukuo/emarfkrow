@@ -767,7 +767,7 @@ public final class DetailActionGenerator {
             if (table.getColumns().containsKey(status)) {
                 String acc = StringUtil.toPascalCase(status);
                 String fld = StringUtil.toCamelCase(status);
-                s.add("        if (!e.get" + acc + "().equals(\"0\")) {");
+                s.add("        if (e.get" + acc + "() != null && !e.get" + acc + "().equals(\"0\")) {");
                 s.add("            throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                    Messages.get(\"" + entity + "." + fld
                         + "\"), Messages.get(\"common.applied\"));");

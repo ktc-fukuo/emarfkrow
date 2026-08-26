@@ -651,7 +651,7 @@ public final class IndexActionGenerator {
             //s.add("                " + e + " f = " + e + ".get(" + params + ");");
             if (table.getColumns().containsKey(status)) {
                 String acc = StringUtil.toPascalCase(status);
-                s.add("                if (!e.get" + acc + "().equals(\"0\")) {");
+                s.add("                if (e.get" + acc + "() != null && !e.get" + acc + "().equals(\"0\")) {");
                 s.add("                    throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                            Messages.get(\"common.selectedRow\"), Messages.get(\"common.applied\"));");
                 s.add("                }");
