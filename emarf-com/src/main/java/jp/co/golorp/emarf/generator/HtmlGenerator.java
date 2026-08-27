@@ -159,6 +159,7 @@ public abstract class HtmlGenerator {
         INPUT_YM_SUFFIXS = bundle.getString("input.ym.suffixs").split(",");
         INPUT_DATE8_SUFFIXS = bundle.getString("input.date8.suffixs").split(",");
         TS_SUFS = bundle.getString("input.timestamp.suffixs").split(",");
+        inputNumberSuffixs = bundle.getString("input.number.suffixs").split(",");
         INPUT_DATETIME_SUFFIXS = bundle.getString("input.datetime.suffixs").split(",");
         INPUT_DATE_SUFFIXS = bundle.getString("input.date.suffixs").split(",");
         INPUT_HOUR_SUFFIXS = bundle.getString("input.hour.suffixs").split(",");
@@ -195,7 +196,6 @@ public abstract class HtmlGenerator {
 
         navIgnoreRe = bundle.getString("nav.ignore.re");
 
-        inputNumberSuffixs = bundle.getString("input.number.suffixs").split(",");
         inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
         pulldownSuffixs = bundle.getString("input.pulldown.suffixs").split(",");
 
@@ -1408,7 +1408,7 @@ public abstract class HtmlGenerator {
      * @param colName
      * @return String
      */
-    private static String getInputType(final String colName) {
+    public static String getInputType(final String colName) {
 
         if (StringUtil.endsWith(INPUT_DATETIME_SUFFIXS, colName)) {
             // 日時項目

@@ -507,6 +507,11 @@ public final class FormGenerator {
             //            if (column.getTypeName().contains("CHAR")) {
             //                s.add("    @jakarta.validation.constraints.Size(max = " + column.getColumnSize() + ")");
             //            }
+            String type = HtmlGenerator.getInputType(column.getName());
+            if (type.equals("text") && column.getTypeName().contains("CHAR")) {
+                s.add("    @jakarta.validation.constraints.Size(" + registGroup + ", max = " + column.getColumnSize()
+                        + ")");
+            }
 
         } else {
             // Patternの指定がない場合
