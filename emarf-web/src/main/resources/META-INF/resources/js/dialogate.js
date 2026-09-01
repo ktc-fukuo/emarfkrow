@@ -345,7 +345,8 @@ let Dialogate = {
                 autoOpen: false,
                 modal: true,
                 title: $link.attr('title'),
-                width: 'auto',
+                //width: 'auto',
+                width: '99%',
 
                 /*
                  * ダイアログオープン
@@ -357,7 +358,7 @@ let Dialogate = {
                     // ダイアログdiv
                     let $dialogDiv = $(event.target);
 
-					// 転生先として表示された場合は、再転生のリンクは非表示
+                    // 転生先として表示された場合は、再転生のリンクは非表示
                     $dialogDiv.find('a.reborner').show();
                     if (isReborner) {
                         $dialogDiv.find('a.reborner').hide();
@@ -422,6 +423,12 @@ let Dialogate = {
 
                         // ダイアログ内の登録フォームに、呼び出し元イベントで値が設定されている場合は、照会結果を初期表示
                         Base.referRegistForm($registForm);
+                    }
+
+                    let grids = $dialogDiv.find('[id$=Grid]');
+                    for (let i = 0;i < grids.length;i++) {
+                        let gridId = grids[i].id;
+                        $('[id$="' + gridId + '"]').css('width', $dialogDiv.css('width'))
                     }
 
                     try {

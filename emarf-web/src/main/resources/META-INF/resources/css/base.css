@@ -243,12 +243,12 @@ input[type="datetime-local"] {
 
 [role="dialog"] [id$="Grid"] {
 	height: 190px;
-	width: 1210px;
+/*	width: 100%;*/
 }
 
 [role="dialog"] [id$="SDialog"] [id$="Grid"] {
 	height: 320px;
-	width: 1210px;
+/*	width: 100%;*/
 }
 
 [role="dialog"] [id$="Pager"] {

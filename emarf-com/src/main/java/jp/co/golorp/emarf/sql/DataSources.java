@@ -1253,18 +1253,19 @@ public final class DataSources {
                     continue;
                 }
 
-                //                // 親に履歴モデルがないのに子に履歴モデルがある場合はスキップ
-                //                if (oya.getHistory() == null && ko.getHistory() != null) {
-                //                    continue;
-                //                }
+                // // 親に履歴モデルがないのに子に履歴モデルがある場合はスキップ
+                // if (oya.getHistory() == null && ko.getHistory() != null) {
+                //     continue;
+                // }
 
-                //                // 親が参照モデルで子がトラン、およびその逆ならスキップ
-                //                if ((oya.isRefer() && !ko.isRefer()) || (!oya.isRefer() && ko.isRefer())) {
-                //                    continue;
-                //                }
+                // // 親が参照モデルで子がトラン、およびその逆ならスキップ
+                // if ((oya.isRefer() && !ko.isRefer()) || (!oya.isRefer() && ko.isRefer())) {
+                //     continue;
+                // }
 
                 // 親が参照モデルなら子のテーブル名が前方一致しなければスキップ
-                // （単独キーだとトラン系に影響する）
+                // （「MCM_ITEM」について「MCM_ITEM_KOSE」は親子にしたいが「MPR_MANU」は親子にしたくない）
+                // （「MLI_WH_LOC_ITEM」について「TLI_TANA」を親子にしたくない）
                 if (oya.isRefer() && !ko.getName().startsWith(oya.getName())) {
                     continue;
                 }
