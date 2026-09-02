@@ -1292,7 +1292,7 @@ public final class DataSources {
                 // 子の主キーの先頭から、親の主キーに合致しなければスキップ
                 String oyaKeyCsv = oyaKeys.toString().replaceAll("[\\[\\]]", "");
                 String koKeyCsv = koKeys.toString().replaceAll("[\\[\\]]", "");
-                if (!koKeyCsv.startsWith(oyaKeyCsv)) {
+                if (!koKeyCsv.startsWith(oyaKeyCsv + ",")) {
                     continue;
                 }
 
@@ -1541,9 +1541,15 @@ public final class DataSources {
                     continue;
                 }
 
-                //                if (deriveTo.getDeriveFroms().size() > 1) {
-                //                    continue;
-                //                }
+                // // 派生先に派生元が複数あるならスキップ
+                // if (deriveTo.getDeriveFroms().size() > 1) {
+                //     continue;
+                // }
+
+                // 派生先に親が居るならスキップ
+                if (deriveTo.getParents().size() > 0) {
+                    continue;
+                }
 
                 sakiFKs = new HashSet<String>();
 

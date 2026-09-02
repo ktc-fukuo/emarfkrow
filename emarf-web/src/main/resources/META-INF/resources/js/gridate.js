@@ -1069,7 +1069,7 @@ var Gridate = {
             if (!data) {
                 data = [];
             }
-			// id列がなければ、子モデルのためrows指定が無かったという事なので、連番を付与
+            // id列がなければ、子モデルのためrows指定が無かったという事なので、連番を付与
             for (let i in data) {
                 let item = data[i];
                 if (item['id']) {
@@ -1171,9 +1171,11 @@ var Gridate = {
                             if ($item[i].type == 'file') {
                                 continue;
                             } else if ($item[i].type == 'month') {
-                                $('[id="' + dialogId + '"] span[id="' + entityName + '.' + camel + '"]').format(v);
-                                v = v.replace(/(\d{4})(\d{2})/, '$1-$2');
-                                $($item[i]).val([v]);
+                                if (v) {
+                                    $('[id="' + dialogId + '"] span[id="' + entityName + '.' + camel + '"]').format(v);
+                                    v = v.replace(/(\d{4})(\d{2})/, '$1-$2');
+                                    $($item[i]).val([v]);
+                                }
                             } else {
                                 $($item[i]).val([v]);
                                 $('[id="' + dialogId + '"] span[id="' + entityName + '.' + camel + '"]').format(v);

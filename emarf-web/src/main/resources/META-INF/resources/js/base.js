@@ -357,8 +357,11 @@ let Base = {
 
     getAuthz: function(href) {
 
-        // 画面IDを取得（URLから、最後の「/」までと「?」以降を除去）
-        let lastPath = href.replace(/\?.+/, '').replace(/.+\//, '');//クエリストリングを除く
+        // 画面IDを取得（URLから、「?」以降と最後の「/」までを除去）
+        let lastPath = href;
+        lastPath = lastPath.replace(/^(.+\?anew).+/, '$1');
+        lastPath = lastPath.replace(/[\?&].+\=.+/, '');
+        lastPath = lastPath.replace(/.+\//, '');//クエリストリングを除く
         //let lastPath = href.replace(/.+\//, '');
 
         // 拡張子を除去
@@ -1265,7 +1268,9 @@ let Base = {
             let $readonlys = $registForm.find('[name$="' + Casing.toCamel(columnStatus) + '"]');
             Base.readonly($readonlys);
 
-            $registForm.find('button.regist').button('option', 'disabled', false);
+            if (Base.getAuthz($registForm[0].action) == '') {
+                $registForm.find('button.regist').button('option', 'disabled', false);
+            }
 
             Nextize.firstImpl($registForm);
         }
