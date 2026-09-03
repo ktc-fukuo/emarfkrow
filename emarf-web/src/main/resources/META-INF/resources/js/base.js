@@ -519,39 +519,41 @@ let Base = {
         // 画面の更新権限のチェック
         $('form[name]').each(function() {
 
+            let $form = $(this);
+
             let formAction = this.action;
 
             // 検索・リセット権限なし
-            $(this).find('button.search, button.reset').each(function() {
+            $form.find('button.search, button.reset').each(function() {
                 if (Base.getAuthz(formAction) != '') {
                     $(this).button('option', 'disabled', true);
                 }
             });
 
             // 参照権限なし
-            $(this).find('a.refer').each(function() {
+            $form.find('a.refer').each(function() {
                 if (Base.getAuthz(this.href) != '') {
-                    $(this).button('option', 'disabled', true)
+                    $(this).button('option', 'disabled', true);
                 }
             });
 
             // 出力権限なし
-            $(this).find('a.output').each(function() {
+            $form.find('a.output').each(function() {
                 if (Base.getAuthz(this.href) != '') {
-                    $(this).button('option', 'disabled', true)
+                    $(this).button('option', 'disabled', true);
                 }
             });
 
             // 更新権限なし
             //            if (authzMsg < 3) {
-            //                $(this).find('button.delete, button.regist').hide();
+            //                $form.find('button.delete, button.regist').hide();
             //                if ($(this).hasClass('regist')) {
-            //                    $(this).find('button.reset').hide();
+            //                    $form.find('button.reset').hide();
             //                } else {
-            //                    $(this).find('a.anew').hide();
+            //                    $form.find('a.anew').hide();
             //                }
             //            }
-            $(this).find('button.delete, button.regist').each(function() {
+            $form.find('button.delete, button.regist').each(function() {
                 let href = $(this).attr('data-action');
                 if (!href) {
                     href = formAction;
@@ -565,14 +567,22 @@ let Base = {
             });
 
             // 追加権限なし
-            $(this).find('a.anew').each(function() {
+            $form.find('a.anew').each(function() {
                 if (Base.getAuthz(this.href) != '') {
-                    $(this).button('option', 'disabled', true)
+                    $(this).button('option', 'disabled', true);
+                    Base.readonly($form.find('.derivee'));
+                }
+            });
+
+            // 集約権限なし
+            $form.find('a.summary').each(function() {
+                if (Base.getAuthz(this.href + '?anew') != '') {
+                    $(this).button('option', 'disabled', true);
                 }
             });
 
             // 申請権限なし
-            $(this).find('button.apply').each(function() {
+            $form.find('button.apply').each(function() {
                 let href = $(this).attr('data-action');
                 if (href) {
                     if (Base.getAuthz(href) != '') {
@@ -582,7 +592,7 @@ let Base = {
             });
 
             // 取消権限なし
-            $(this).find('button.cancel').each(function() {
+            $form.find('button.cancel').each(function() {
                 let href = $(this).attr('data-action');
                 if (href) {
                     if (Base.getAuthz(href) != '') {
@@ -592,7 +602,7 @@ let Base = {
             });
 
             // 承認権限なし
-            $(this).find('button.permit').each(function() {
+            $form.find('button.permit').each(function() {
                 let href = $(this).attr('data-action');
                 if (href) {
                     if (Base.getAuthz(href) != '') {
@@ -602,7 +612,7 @@ let Base = {
             });
 
             // 否認権限なし
-            $(this).find('button.forbid').each(function() {
+            $form.find('button.forbid').each(function() {
                 let href = $(this).attr('data-action');
                 if (href) {
                     if (Base.getAuthz(href) != '') {
@@ -1028,6 +1038,15 @@ let Base = {
                             }
                         });
 
+                        // 子明細追加ボタンの状態編集
+                        $registForm.find('a.addChild').each(function() {
+                            if (Base.getAuthz(this.href) == '') {
+                                $(this).button('option', 'disabled', false);
+                            } else {
+                                $(this).button('option', 'disabled', true);
+                            }
+                        });
+
                         // 更新権限がない場合は全てを非活性
                         $registForm.find('button.regist').each(function() {
 
@@ -1069,8 +1088,18 @@ let Base = {
                             });
 
                             // 転生可能
-                            $registForm.find('a.reborner').button('option', 'disabled', false);
-                            $registForm.find('a.deriveTo').button('option', 'disabled', false);
+                            $registForm.find('a.reborner').each(function() {
+                                if (Base.getAuthz(this.href + '?anew') == '') {
+                                    $(this).button('option', 'disabled', false);
+                                }
+                            });
+
+                            // 派生可能
+                            $registForm.find('a.deriveTo').each(function() {
+                                if (Base.getAuthz(this.href + '?anew') == '') {
+                                    $(this).button('option', 'disabled', false);
+                                }
+                            });
 
                         } else if ($statusKb.val() == null) {
                             /*
@@ -1170,8 +1199,18 @@ let Base = {
                             }
 
                             // 転生可能
-                            $registForm.find('a.reborner').button('option', 'disabled', false);
-                            $registForm.find('a.deriveTo').button('option', 'disabled', false);
+                            $registForm.find('a.reborner').each(function() {
+                                if (Base.getAuthz(this.href + '?anew') == '') {
+                                    $(this).button('option', 'disabled', false);
+                                }
+                            });
+
+                            // 派生可能
+                            $registForm.find('a.deriveTo').each(function() {
+                                if (Base.getAuthz(this.href + '?anew') == '') {
+                                    $(this).button('option', 'disabled', false);
+                                }
+                            });
 
                             // 否認可能
                             let isReborned = false;

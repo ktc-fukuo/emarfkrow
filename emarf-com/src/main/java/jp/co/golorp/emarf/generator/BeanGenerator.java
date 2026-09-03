@@ -384,17 +384,24 @@ public final class BeanGenerator {
         s.add("");
         s.add("    /** @return boolean 主キーが不足していたらtrue */");
         s.add("    public boolean isNew() {");
+        int i = 0;
         for (String primaryKey : table.getPrimaryKeys()) {
             String camel = StringUtil.toCamelCase(primaryKey);
-            s.add("        if (jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + camel + ")) {");
+            String t = "        ";
+            if (i++ > 0) {
+                t += "} else ";
+            }
+            t += "if (jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + camel + ")) {";
+            s.add(t);
             s.add("            return true;");
+        }
+        if (table.getPrimaryKeys().size() > 0) {
             s.add("        }");
         }
         if (table.getColumns().containsKey(updateTs)) {
             String camel = StringUtil.toCamelCase(updateTs);
-            s.add("        // 楽観ロック値がなくてもINSERT");
             s.add("        if (jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + camel + ")) {");
-            s.add("            return true;");
+            s.add("            return true; // 楽観ロック値がなくてもINSERT");
             s.add("        }");
         }
         s.add("        return false;");

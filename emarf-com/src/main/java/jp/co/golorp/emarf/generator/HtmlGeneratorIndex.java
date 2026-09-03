@@ -18,7 +18,6 @@ package jp.co.golorp.emarf.generator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -71,18 +70,18 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         s.add("      </fieldset>\r\n      <div class=\"buttons\">\r\n        <button type=\"button\" id=\"Reset" + e
                 + "\" th:text=\"#{common.reset}\" class=\"reset\" onClick=\"Dialogate.reset(event);\">reset</button>");
         boolean isAnew = isAnew(table);
-        if (isAnew || table.getRebornFrom() != null) {
-            boolean isDeriver = false;
-            for (ColumnInfo col : table.getColumns().values()) {
-                if (col.getDeriveFrom() != null) {
-                    isDeriver = true;
-                    break;
-                }
-            }
+        if (isAnew && table.getRebornFrom() == null) {
+            //            boolean isDeriver = false;
+            //            for (ColumnInfo col : table.getColumns().values()) {
+            //                if (col.getDeriveFrom() != null) {
+            //                    isDeriver = true;
+            //                    break;
+            //                }
+            //            }
             String anewClass = "anew";
-            if (isDeriver) {
-                anewClass += " derive";
-            }
+            //            if (isDeriver) {
+            //                anewClass += " derive";
+            //            }
             if (table.getPrimaryKeys().size() > 0) {
                 s.add("        <a th:href=\"@{/model/" + e + ".html(anew)}\" target=\"dialog\" id=\"" + e
                         + "\" class=\"" + anewClass + "\" th:text=\"#{" + e + ".add}\" tabindex=\"-1\">"
@@ -96,22 +95,25 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
             //                            + bro.getName() + "</a>");
             //                }
             //            }
-            if (isDeriver) {
-                HashSet<String> deriveFroms = new HashSet<String>();
-                for (ColumnInfo col : table.getColumns().values()) {
-                    if (col.getDeriveFrom() != null && !deriveFroms.contains(col.getDeriveFrom().getName())) {
-                        deriveFroms.add(col.getDeriveFrom().getName());
-                        String field = null;
-                        for (String pk : col.getDeriveFrom().getPrimaryKeys()) {
-                            field = e + ".derivee" + StringUtil.toPascalCase(pk);
-                            s.add(htmlFieldsInput(field, "text", "", col.getDeriveFrom().getColumns().get(pk), null));
-                        }
-                        String refer = StringUtil.toPascalCase(col.getDeriveFrom().getName());
-                        s.add("          <a id=\"" + field + "\" th:href=\"@{/model/" + refer + "S.html?action=" + refer
-                                + "Correct.ajax}\" target=\"dialog\" class=\"derivee\" th:text=\"#{common.correct}\" tabindex=\"-1\">...</a>");
-                    }
-                }
-            }
+            // 派生元の選択は表示しない
+            //            // 派生先に該当する場合は派生元の指定項目を配置
+            //            if (isDeriver) {
+            //                HashSet<String> deriveFroms = new HashSet<String>();
+            //                for (ColumnInfo col : table.getColumns().values()) {
+            //                    if (col.getDeriveFrom() != null && !deriveFroms.contains(col.getDeriveFrom().getName())) {
+            //                        deriveFroms.add(col.getDeriveFrom().getName());
+            //                        String field = null;
+            //                        for (String pk : col.getDeriveFrom().getPrimaryKeys()) {
+            //                            field = e + ".derivee" + StringUtil.toPascalCase(pk);
+            //                            s.add(htmlFieldsInput(field, "text", "derivee", col.getDeriveFrom().getColumns().get(pk),
+            //                                    null));
+            //                        }
+            //                        String refer = StringUtil.toPascalCase(col.getDeriveFrom().getName());
+            //                        s.add("          <a id=\"" + field + "\" th:href=\"@{/model/" + refer + "S.html?action=" + refer
+            //                                + "Correct.ajax}\" target=\"dialog\" class=\"derivee\" th:text=\"#{common.correct}\" tabindex=\"-1\">...</a>");
+            //                    }
+            //                }
+            //            }
         }
         s.add("      </div>\r\n      <div class=\"submits\">");
         s.add(getSearchButton(table, e));

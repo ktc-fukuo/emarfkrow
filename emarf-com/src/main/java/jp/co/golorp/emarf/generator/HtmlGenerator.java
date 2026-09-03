@@ -666,9 +666,14 @@ public abstract class HtmlGenerator {
         for (ColumnInfo column : table.getColumns().values()) {
             String property = StringUtil.toCamelCase(column.getName());
             s.add(e + "." + property + " " + column.getRemarks());
-            if (column.getDeriveFrom() != null) {
-                s.add(e + ".derivee" + StringUtil.toPascalCase(property) + " " + column.getRemarks());
-            }
+            // 派生元の選択は表示しない
+            //if (column.getDeriveFrom() != null) {
+            //    for (String primaryKey : column.getDeriveFrom().getPrimaryKeys()) {
+            //        ColumnInfo pk = column.getDeriveFrom().getColumns().get(primaryKey);
+            //        String p = StringUtil.toCamelCase(pk.getName());
+            //        s.add(e + ".derivee" + StringUtil.toPascalCase(p) + " " + pk.getRemarks());
+            //    }
+            //}
         }
 
         s.add("");
