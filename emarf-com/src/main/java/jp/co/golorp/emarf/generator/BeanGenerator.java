@@ -84,12 +84,12 @@ public final class BeanGenerator {
     private static String statusKessaiId;
 
     /** javaファイル出力ルートパス */
-    private static String javaDir;
+    private static String javaDir = "src\\main\\java";
 
     /** actionパッケージ */
-    private static String pkgAction;
+    private static String pkgA = "com.example.action.model.base";
     /** entityパッケージ */
-    private static String pkgE;
+    private static String pkgE = "com.example.entity";
 
     /** 必須CHAR列の指定 */
     private static String charNotNullRe;
@@ -134,37 +134,37 @@ public final class BeanGenerator {
 
         //プロジェクトディレクトリを退避
         projectDir = dir;
-        tekiyoBi = bundle.getString("column.start");
-        insertTs = bundle.getString("column.insert.timestamp");
-        insertBy = bundle.getString("column.insert.id");
-        updateTs = bundle.getString("column.update.timestamp");
-        updateBy = bundle.getString("column.update.id");
-        status = bundle.getString("column.status");
-        deleteF = bundle.getString("column.delete");
-        reason = bundle.getString("column.reason");
-        statusTableName = bundle.getString("status.tableName");
-        statusPrimaryKeys = bundle.getString("status.primaryKeys");
-        statusKessaiTs = bundle.getString("status.kessaiTs");
-        statusKessaiId = bundle.getString("status.kessaiId");
-        javaDir = bundle.getString("dir.java");
-        pkgAction = bundle.getString("java.package.action") + ".model.base";
-        pkgE = bundle.getString("java.package.entity");
-
-        //NOTNULLで必須項目として扱うCHARの列名リスト（ホストの△対応）
-        charNotNullRe = bundle.getString("column.char.notnull.re");
-        //NOTNULLのINT列で「0」を補填する列名指定
-        numberNullableRe = bundle.getString("column.number.nullable.re");
-        //登録情報・更新情報の列名
-        updateTsFormat = bundle.getString("column.update.timestamp.format");
-
-        inputYMSuffixs = bundle.getString("input.ym.suffixs").split(",");
-        inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-        inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
-        inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
-        inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
-        //        inputTimeSuffixs = bundle.getString("input.time.suffixs").split(",");
-        inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
-        inputFileSuffixs = bundle.getString("input.file.suffixs").split(",");
+        if (bundle != null) {
+            tekiyoBi = bundle.getString("column.start");
+            insertTs = bundle.getString("column.insert.timestamp");
+            insertBy = bundle.getString("column.insert.id");
+            updateTs = bundle.getString("column.update.timestamp");
+            updateBy = bundle.getString("column.update.id");
+            status = bundle.getString("column.status");
+            deleteF = bundle.getString("column.delete");
+            reason = bundle.getString("column.reason");
+            statusTableName = bundle.getString("status.tableName");
+            statusPrimaryKeys = bundle.getString("status.primaryKeys");
+            statusKessaiTs = bundle.getString("status.kessaiTs");
+            statusKessaiId = bundle.getString("status.kessaiId");
+            javaDir = bundle.getString("dir.java");
+            pkgA = bundle.getString("java.package.action") + ".model.base";
+            pkgE = bundle.getString("java.package.entity");
+            //NOTNULLで必須項目として扱うCHARの列名リスト（ホストの△対応）
+            charNotNullRe = bundle.getString("column.char.notnull.re");
+            //NOTNULLのINT列で「0」を補填する列名指定
+            numberNullableRe = bundle.getString("column.number.nullable.re");
+            //登録情報・更新情報の列名
+            updateTsFormat = bundle.getString("column.update.timestamp.format");
+            inputYMSuffixs = bundle.getString("input.ym.suffixs").split(",");
+            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
+            inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
+            inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
+            inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
+            //        inputTimeSuffixs = bundle.getString("input.time.suffixs").split(",");
+            inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
+            inputFileSuffixs = bundle.getString("input.file.suffixs").split(",");
+        }
 
         /*
          * 出力フォルダ再作成
@@ -176,7 +176,7 @@ public final class BeanGenerator {
         FileUtil.reMkDir(entityPackageDir);
 
         //アクションフォルダ
-        String actionPackagePath = pkgAction.replace(".", File.separator);
+        String actionPackagePath = pkgA.replace(".", File.separator);
         String actionPackageDir = projectDir + File.separator + javaDir + File.separator + actionPackagePath;
         FileUtil.reMkDir(actionPackageDir);
 

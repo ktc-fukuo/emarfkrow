@@ -207,6 +207,9 @@ public final class StringUtil {
      * @return 検査文字列がプレフィックスの何れかに合致すればtrue
      */
     public static boolean startsWith(final String[] prefixes, final String s) {
+        if (prefixes == null) {
+            return false;
+        }
         for (String prefix : prefixes) {
             if (startsWithIgnoreCase(prefix, s)) {
                 return true;
@@ -233,6 +236,9 @@ public final class StringUtil {
      * @return 検査文字列がサフィックスの何れかに合致すればtrue
      */
     public static boolean endsWith(final String[] suffixs, final String s) {
+        if (suffixs == null) {
+            return false;
+        }
         for (String suffix : suffixs) {
             if (endsWithIgnoreCase(suffix, s)) {
                 return true;

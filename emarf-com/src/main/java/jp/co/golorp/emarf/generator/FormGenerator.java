@@ -45,10 +45,10 @@ public final class FormGenerator {
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
     /** formパッケージ */
-    private static String pkgForm;
+    private static String pkgF = "com.example.form.model.base";
 
     /** javaファイル出力ルートパス */
-    private static String javaDir;
+    private static String javaDir = "src\\main\\java";
 
     /** プロジェクトディレクトリ */
     private static String projectDir;
@@ -94,30 +94,33 @@ public final class FormGenerator {
             isGenerateAtStartup = App.get("generateAtStartup").toLowerCase().equals("true");
         }
 
-        pkgForm = bundle.getString("java.package.form") + ".model.base";
-        javaDir = bundle.getString("dir.java");
-        tekiyoBi = bundle.getString("column.start");
-        updateTs = bundle.getString("column.update.timestamp");
-
-        inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
-
-        //validator正規表現の接尾辞を取得
         validSuffixs = new ArrayList<String>();
-        for (String key : bundle.keySet()) {
-            if (key.startsWith("valid.")) {
-                validSuffixs.add(key.replaceFirst("valid.", ""));
+        if (bundle != null) {
+
+            pkgF = bundle.getString("java.package.form") + ".model.base";
+            javaDir = bundle.getString("dir.java");
+            tekiyoBi = bundle.getString("column.start");
+            updateTs = bundle.getString("column.update.timestamp");
+
+            inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
+
+            //validator正規表現の接尾辞を取得
+            for (String key : bundle.keySet()) {
+                if (key.startsWith("valid.")) {
+                    validSuffixs.add(key.replaceFirst("valid.", ""));
+                }
             }
+
+            //NOTNULLで必須項目として扱うCHARの列名リスト（ホストの△対応）
+            charNotNullRe = bundle.getString("column.char.notnull.re");
+            //NOTNULLのINT列で「0」を補填する列名指定
+            numberNullableRe = bundle.getString("column.number.nullable.re");
+            //タイムスタンプサフィックス
+            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
         }
 
-        //NOTNULLで必須項目として扱うCHARの列名リスト（ホストの△対応）
-        charNotNullRe = bundle.getString("column.char.notnull.re");
-        //NOTNULLのINT列で「0」を補填する列名指定
-        numberNullableRe = bundle.getString("column.number.nullable.re");
-        //タイムスタンプサフィックス
-        inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-
         //フォームフォルダ
-        String pkgFormPath = pkgForm.replace(".", File.separator);
+        String pkgFormPath = pkgF.replace(".", File.separator);
         String pkgFormDir = projectDir + File.separator + javaDir + File.separator + pkgFormPath;
         FileUtil.reMkDir(pkgFormDir);
 
@@ -130,7 +133,7 @@ public final class FormGenerator {
      * @param tableInfos テーブル情報のリスト
      */
     private static void javaFormDetailRegist(final List<TableInfo> tableInfos) {
-        String packagePath = pkgForm.replace(".", File.separator);
+        String packagePath = pkgF.replace(".", File.separator);
         String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tableInfos) {
@@ -139,7 +142,7 @@ public final class FormGenerator {
             }
             String entity = StringUtil.toPascalCase(table.getName());
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgForm + ";");
+            s.add("package " + pkgF + ";");
             addImports(s);
             addAuthor(s, table.getRemarks() + "登録フォーム");
             s.add("public class " + entity + "RegistForm implements IForm {");
@@ -234,7 +237,7 @@ public final class FormGenerator {
             javaFormDetailRegistRelCheck(table, s);
             s.add("}");
             String javaFilePath = packageDir + File.separator + entity + "RegistForm.java";
-            javaFilePaths.put(javaFilePath, pkgForm + "." + entity + "RegistForm");
+            javaFilePaths.put(javaFilePath, pkgF + "." + entity + "RegistForm");
             FileUtil.writeFile(javaFilePath, s);
         }
         if (isGenerateAtStartup) {
@@ -551,7 +554,7 @@ public final class FormGenerator {
     private static void javaFormIndexRegist(final List<TableInfo> tableInfos) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgForm.replace(".", File.separator);
+        String packagePath = pkgF.replace(".", File.separator);
         String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -568,7 +571,7 @@ public final class FormGenerator {
             String instance = StringUtil.toCamelCase(tableName);
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgForm + ";");
+            s.add("package " + pkgF + ";");
             s.add("");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
@@ -621,7 +624,7 @@ public final class FormGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "SRegistForm.java";
-            javaFilePaths.put(javaFilePath, pkgForm + "." + entity + "SRegistForm");
+            javaFilePaths.put(javaFilePath, pkgF + "." + entity + "SRegistForm");
 
             FileUtil.writeFile(javaFilePath, s);
         }

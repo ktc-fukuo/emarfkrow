@@ -69,37 +69,37 @@ public final class DataSources {
     private static Set<String[]> referPairs = new LinkedHashSet<String[]>();
 
     /** 長兄 */
-    private static String nonReferRe;
+    private static String nonReferRe = "";
 
     /** 評価対象としないテーブル名の正規表現 */
     private static String ignoreRe;
 
     /** 兄弟判定で、長兄とするテーブル名の正規表現 */
-    private static String eldestRe;
+    private static String eldestRe = "";
 
     /** 繰上りの弟モデルのテーブル名 */
-    private static String fosterRe;
+    private static String fosterRe = "";
 
     /** 弟を設定しないテーブル名 */
-    private static String youngestRe;
+    private static String youngestRe = "";
 
     /** 子を設定しないテーブル名 */
-    private static String dinksRe;
+    private static String dinksRe = "";
 
     /** 親を設定しないテーブル名 */
-    private static String orphansRe;
+    private static String orphansRe = "";
 
     /** 列評価をスキップする列名 */
-    private static String columnIgnoreRe;
+    private static String columnIgnoreRe = "";
 
     /** ステータス区分 */
-    private static String status;
+    private static String status = "";
 
     /** 変更理由 */
     private static String reason;
 
     /** VIEWで変換先を指定する列名 */
-    private static String viewDetailColumn;
+    private static String viewDetailColumn = "";
 
     /** ガントチャート化を判定する項目名のカラムサフィックス */
     private static Set<String[]> ganttColumns = new LinkedHashSet<String[]>();
@@ -108,10 +108,10 @@ public final class DataSources {
     private static Set<String[]> graphColumns = new LinkedHashSet<String[]>();
 
     /** 数値列で自動採番しないサフィックス */
-    private static String noNumberingIntRe;
+    private static String noNumberingIntRe = "";
 
     /** 固定長列で自動採番のサフィックス */
-    private static String numberingCharRe;
+    private static String numberingCharRe = "";
 
     /** DataSourceのJNDI名 */
     private static final String JNDI_NAME = "JNDIName";
@@ -265,63 +265,66 @@ public final class DataSources {
 
         ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
-        String[] pairs = bundle.getString("relation.refer.pairs").split(",");
-        for (String pair : pairs) {
-            String[] kv = pair.split(":");
-            referPairs.add(kv);
+        if (bundle != null) {
+
+            String[] pairs = bundle.getString("relation.refer.pairs").split(",");
+            for (String pair : pairs) {
+                String[] kv = pair.split(":");
+                referPairs.add(kv);
+            }
+
+            nonReferRe = bundle.getString("relation.nonrefer.re");
+
+            ignoreRe = bundle.getString("relation.ignore.re");
+
+            eldestRe = bundle.getString("relation.eldest.re");
+
+            fosterRe = bundle.getString("relation.foster.re");
+
+            youngestRe = bundle.getString("relation.youngest.re");
+
+            dinksRe = bundle.getString("relation.dinks.re");
+
+            orphansRe = bundle.getString("relation.orphans.re");
+
+            columnIgnoreRe = bundle.getString("column.ignore.re");
+
+            status = bundle.getString("column.status");
+
+            reason = bundle.getString("column.reason");
+
+            viewDetailColumn = bundle.getString("view.detail");
+
+            String[] ganttDefs = bundle.getString("gantt.columns").split(",");
+            for (String ganttDef : ganttDefs) {
+                String[] columns = ganttDef.split(":");
+                ganttColumns.add(columns);
+            }
+
+            String[] graphDefs = bundle.getString("graph.columns").split(",");
+            for (String graphDef : graphDefs) {
+                String[] columns = graphDef.split(":");
+                graphColumns.add(columns);
+            }
+
+            noNumberingIntRe = bundle.getString("column.int.nonumbering.re");
+
+            numberingCharRe = bundle.getString("column.char.numbering.re");
+
+            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
+
+            inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
+
+            inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
+
+            inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
+
+            //        inputTimeSuffixs = bundle.getString("input.time.suffixs").split(",");
+
+            inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
+
+            tekiyoBi = bundle.getString("column.start").toUpperCase();
         }
-
-        nonReferRe = bundle.getString("relation.nonrefer.re");
-
-        ignoreRe = bundle.getString("relation.ignore.re");
-
-        eldestRe = bundle.getString("relation.eldest.re");
-
-        fosterRe = bundle.getString("relation.foster.re");
-
-        youngestRe = bundle.getString("relation.youngest.re");
-
-        dinksRe = bundle.getString("relation.dinks.re");
-
-        orphansRe = bundle.getString("relation.orphans.re");
-
-        columnIgnoreRe = bundle.getString("column.ignore.re");
-
-        status = bundle.getString("column.status");
-
-        reason = bundle.getString("column.reason");
-
-        viewDetailColumn = bundle.getString("view.detail");
-
-        String[] ganttDefs = bundle.getString("gantt.columns").split(",");
-        for (String ganttDef : ganttDefs) {
-            String[] columns = ganttDef.split(":");
-            ganttColumns.add(columns);
-        }
-
-        String[] graphDefs = bundle.getString("graph.columns").split(",");
-        for (String graphDef : graphDefs) {
-            String[] columns = graphDef.split(":");
-            graphColumns.add(columns);
-        }
-
-        noNumberingIntRe = bundle.getString("column.int.nonumbering.re");
-
-        numberingCharRe = bundle.getString("column.char.numbering.re");
-
-        inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-
-        inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
-
-        inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
-
-        inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
-
-        //        inputTimeSuffixs = bundle.getString("input.time.suffixs").split(",");
-
-        inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
-
-        tekiyoBi = bundle.getString("column.start").toUpperCase();
     }
 
     /**
@@ -370,9 +373,10 @@ public final class DataSources {
                     }
                     column.setTypeName(typeName.toUpperCase());
                     column.setColumnSize(assist.getColumnSize(columns)); // カラムサイズ
-                    if (column.getColumnSize() == 0) {
-                        column.setColumnSize(3);
-                    }
+                    // TODO postgresで確認・viewでnullを引いているケースはcastを入れる
+                    //                    if (column.getColumnSize() == 0) {
+                    //                        column.setColumnSize(3);
+                    //                    }
                     if (StringUtil.endsWith(inputDateSuffixs, columnName)) { // 桁制限
                         column.setMaxLength(10);
                     } else if (StringUtil.endsWith(inputHourSuffixs, columnName)) {

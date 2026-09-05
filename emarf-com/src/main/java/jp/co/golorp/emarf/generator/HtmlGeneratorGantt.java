@@ -18,7 +18,6 @@ package jp.co.golorp.emarf.generator;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -69,18 +68,18 @@ public final class HtmlGeneratorGantt extends HtmlGenerator {
         s.add("        <button type=\"button\" id=\"Reset" + e
                 + "\" th:text=\"#{common.reset}\" class=\"reset\" onClick=\"Dialogate.reset(event);\">reset</button>");
         boolean isAnew = isAnew(table);
-        if (isAnew || table.getRebornFrom() != null) {
-            boolean isDeriver = false;
-            for (ColumnInfo col : table.getColumns().values()) {
-                if (col.getDeriveFrom() != null) {
-                    isDeriver = true;
-                    break;
-                }
-            }
+        if (isAnew && table.getRebornFrom() == null) {
+            //            boolean isDeriver = false;
+            //            for (ColumnInfo col : table.getColumns().values()) {
+            //                if (col.getDeriveFrom() != null) {
+            //                    isDeriver = true;
+            //                    break;
+            //                }
+            //            }
             String anewClass = "anew";
-            if (isDeriver) {
-                anewClass += " derive";
-            }
+            //            if (isDeriver) {
+            //                anewClass += " derive";
+            //            }
             s.add("        <a th:href=\"@{/model/" + e + ".html(anew)}\" target=\"dialog\" id=\"" + e + "\" class=\""
                     + anewClass + "\" th:text=\"#{" + e + ".add}\" tabindex=\"-1\">" + table.getName() + "</a>");
             //            if (table.getName().matches(ELDEST_RE)) {
@@ -91,22 +90,22 @@ public final class HtmlGeneratorGantt extends HtmlGenerator {
             //                            + bro.getName() + "</a>");
             //                }
             //            }
-            if (isDeriver) {
-                HashSet<String> deriveFroms = new HashSet<String>();
-                for (ColumnInfo col : table.getColumns().values()) {
-                    if (col.getDeriveFrom() != null && !deriveFroms.contains(col.getDeriveFrom().getName())) {
-                        deriveFroms.add(col.getDeriveFrom().getName());
-                        String fieldId = null;
-                        for (String pk : col.getDeriveFrom().getPrimaryKeys()) {
-                            fieldId = e + ".derivee" + StringUtil.toPascalCase(pk);
-                            s.add(htmlFieldsInput(fieldId, "text", "", col.getDeriveFrom().getColumns().get(pk), null));
-                        }
-                        String r = StringUtil.toPascalCase(col.getDeriveFrom().getName());
-                        s.add("          <a id=\"" + fieldId + "\" th:href=\"@{/model/" + r + "S.html?action=" + r
-                                + "Correct.ajax}\" target=\"dialog\" class=\"derivee\" th:text=\"#{common.correct}\" tabindex=\"-1\">...</a>");
-                    }
-                }
-            }
+            //            if (isDeriver) {
+            //                HashSet<String> deriveFroms = new HashSet<String>();
+            //                for (ColumnInfo col : table.getColumns().values()) {
+            //                    if (col.getDeriveFrom() != null && !deriveFroms.contains(col.getDeriveFrom().getName())) {
+            //                        deriveFroms.add(col.getDeriveFrom().getName());
+            //                        String fieldId = null;
+            //                        for (String pk : col.getDeriveFrom().getPrimaryKeys()) {
+            //                            fieldId = e + ".derivee" + StringUtil.toPascalCase(pk);
+            //                            s.add(htmlFieldsInput(fieldId, "text", "", col.getDeriveFrom().getColumns().get(pk), null));
+            //                        }
+            //                        String r = StringUtil.toPascalCase(col.getDeriveFrom().getName());
+            //                        s.add("          <a id=\"" + fieldId + "\" th:href=\"@{/model/" + r + "S.html?action=" + r
+            //                                + "Correct.ajax}\" target=\"dialog\" class=\"derivee\" th:text=\"#{common.correct}\" tabindex=\"-1\">...</a>");
+            //                    }
+            //                }
+            //            }
         }
         s.add("      </div>");
         s.add("      <div class=\"submits\">");

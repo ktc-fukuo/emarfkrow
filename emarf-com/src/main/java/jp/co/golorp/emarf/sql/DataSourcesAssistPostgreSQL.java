@@ -223,6 +223,7 @@ public final class DataSourcesAssistPostgreSQL extends DataSourcesAssist {
 
     @Override
     public int getColumnSize(final ResultSet columns) throws SQLException {
+        // TODO postgresで確認
         return columns.getInt("COLUMN_SIZE");
     }
 

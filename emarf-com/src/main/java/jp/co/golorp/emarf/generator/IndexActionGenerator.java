@@ -40,13 +40,13 @@ public final class IndexActionGenerator {
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
     /** actionパッケージ */
-    private static String actionPkg;
+    private static String pkgA = "com.example.action.model.base";
 
     /** entityパッケージ */
-    private static String entityPackage;
+    private static String pkgE = "com.example.entity";
 
     /** javaファイル出力ルートパス */
-    private static String javaPath;
+    private static String javaPath = "src\\main\\java";
 
     /** 起動時の自動生成か */
     private static boolean isGenerateAtStartup;
@@ -73,20 +73,23 @@ public final class IndexActionGenerator {
         //プロジェクトディレクトリを退避
         prjDir = dir;
 
-        actionPkg = bundle.getString("java.package.action") + ".model.base";
+        if (bundle != null) {
 
-        entityPackage = bundle.getString("java.package.entity");
+            pkgA = bundle.getString("java.package.action") + ".model.base";
 
-        javaPath = bundle.getString("dir.java");
+            pkgE = bundle.getString("java.package.entity");
+
+            javaPath = bundle.getString("dir.java");
+
+            status = bundle.getString("column.status");
+
+            deleteF = bundle.getString("column.delete");
+        }
 
         //webからの自動生成ならコンパイルまで行う
         if (App.get("generateAtStartup") != null) {
             isGenerateAtStartup = App.get("generateAtStartup").toLowerCase().equals("true");
         }
-
-        status = bundle.getString("column.status");
-
-        deleteF = bundle.getString("column.delete");
 
         IndexActionGenerator.deleteAction(tableInfos);
         IndexActionGenerator.registAction(tableInfos);
@@ -105,7 +108,7 @@ public final class IndexActionGenerator {
     private static void deleteAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String pkgPath = actionPkg.replace(".", File.separator);
+        String pkgPath = pkgA.replace(".", File.separator);
         String pkgDir = prjDir + File.separator + javaPath + File.separator + pkgPath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -129,14 +132,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -197,7 +200,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = pkgDir + File.separator + e + "SDeleteAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SDeleteAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SDeleteAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -216,7 +219,7 @@ public final class IndexActionGenerator {
     private static void registAction(final List<TableInfo> tableInfos) {
 
         // 出力フォルダを再作成
-        String packagePath = actionPkg.replace(".", File.separator);
+        String packagePath = pkgA.replace(".", File.separator);
         String packageDir = prjDir + File.separator + javaPath + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -235,14 +238,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -316,7 +319,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SRegistAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SRegistAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SRegistAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -335,7 +338,7 @@ public final class IndexActionGenerator {
     private static void applyAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = actionPkg.replace(".", File.separator);
+        String packagePath = pkgA.replace(".", File.separator);
         String packageDir = prjDir + File.separator + javaPath + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -351,14 +354,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -436,7 +439,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SApplyAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SApplyAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SApplyAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -455,7 +458,7 @@ public final class IndexActionGenerator {
     private static void cancelAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = actionPkg.replace(".", File.separator);
+        String packagePath = pkgA.replace(".", File.separator);
         String packageDir = prjDir + File.separator + javaPath + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -471,14 +474,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -556,7 +559,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SCancelAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SCancelAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SCancelAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -575,7 +578,7 @@ public final class IndexActionGenerator {
     private static void permitAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = actionPkg.replace(".", File.separator);
+        String packagePath = pkgA.replace(".", File.separator);
         String packageDir = prjDir + File.separator + javaPath + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -591,14 +594,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -676,7 +679,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SPermitAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SPermitAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SPermitAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -695,7 +698,7 @@ public final class IndexActionGenerator {
     private static void forbidAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = actionPkg.replace(".", File.separator);
+        String packagePath = pkgA.replace(".", File.separator);
         String packageDir = prjDir + File.separator + javaPath + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -711,14 +714,14 @@ public final class IndexActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + actionPkg + ";");
+            s.add("package " + pkgA + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + entityPackage + "." + e + ";");
+            s.add("import " + pkgE + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -796,7 +799,7 @@ public final class IndexActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SForbidAction.java";
-            javaFilePaths.put(javaFilePath, actionPkg + "." + e + "SForbidAction");
+            javaFilePaths.put(javaFilePath, pkgA + "." + e + "SForbidAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }

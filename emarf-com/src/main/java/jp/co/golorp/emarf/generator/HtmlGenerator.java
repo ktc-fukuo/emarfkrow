@@ -57,7 +57,7 @@ public abstract class HtmlGenerator {
     /** 長兄 */
     protected static final String ELDEST_RE;
     /** 弟を設定しないテーブル名 */
-    private static String youngestRe;
+    private static String youngestRe = "";
 
     /** 参照列名ペア */
     protected static final Set<String[]> REFER_PAIRS = new LinkedHashSet<String[]>();
@@ -90,7 +90,7 @@ public abstract class HtmlGenerator {
     /** ガントチャート化を判定する項目名・開始日・終了日のカラムサフィックス */
     private static Set<String[]> ganttColumns = new LinkedHashSet<String[]>();
     /** メニュー化しない正規表現 */
-    private static String navIgnoreRe;
+    private static String navIgnoreRe = "";
 
     /** 読み取り専用サフィックス */
     protected static final String[] INPUT_READONLY_SUFFIXS;
@@ -137,42 +137,81 @@ public abstract class HtmlGenerator {
     /** 業務順のプレフィクス正規表現 */
     private static Map<String, String> navOrderRes = new TreeMap<String, String>();
 
+    /***/
+    private static String dirHtml = "src\\main\\resources\\META-INF\\resources\\WEB-INF\\templates\\model";
+    /***/
+    private static String dirGrid = "src\\main\\resources\\META-INF\\resources\\model";
+
     static {
-        ELDEST_RE = bundle.getString("relation.eldest.re");
-        String[] pairs = bundle.getString("relation.refer.pairs").split(",");
-        for (String pair : pairs) {
-            String[] kv = pair.split(":");
-            REFER_PAIRS.add(kv);
+        if (bundle == null) {
+            ELDEST_RE = "";
+            TEKIYO_BI = "";
+            HAISHI_BI = "";
+            UPDATE_TS = "";
+            STATUS = "";
+            DELETE_F = "";
+            REASON = "";
+            INT_NOFORMAT_SUFFIXS = null;
+            CHAR_NOTNULL_RE = "";
+            GRID_ROWS = "";
+            VIEW_CRITERIA_PREFIXS = null;
+            VIEW_DETAIL = "";
+            INPUT_READONLY_SUFFIXS = null;
+            INPUT_YM_SUFFIXS = null;
+            INPUT_DATE8_SUFFIXS = null;
+            TS_SUFS = null;
+            inputNumberSuffixs = null;
+            INPUT_DATETIME_SUFFIXS = null;
+            INPUT_DATE_SUFFIXS = null;
+            INPUT_HOUR_SUFFIXS = null;
+            INPUT_TIME_SUFFIXS = null;
+            INPUT_FLAG_SUFFIXS = null;
+            INPUT_BIT_SUFFIXS = null;
+            FILE_SUFS = null;
+            OPTIONS_SUFFIXS = null;
+            TEXTAREA_SUFFIXS = null;
+            JSON = "";
+            OPT_K = "";
+            OPT_V = "";
+            OPT_L = "";
+        } else {
+            ELDEST_RE = bundle.getString("relation.eldest.re");
+            String[] pairs = bundle.getString("relation.refer.pairs").split(",");
+            for (String pair : pairs) {
+                String[] kv = pair.split(":");
+                REFER_PAIRS.add(kv);
+            }
+            TEKIYO_BI = bundle.getString("column.start");
+            HAISHI_BI = bundle.getString("column.until");
+            UPDATE_TS = bundle.getString("column.update.timestamp");
+            STATUS = bundle.getString("column.status");
+            DELETE_F = bundle.getString("column.delete");
+            REASON = bundle.getString("column.reason");
+            INT_NOFORMAT_SUFFIXS = bundle.getString("column.int.noformat.suffixs").split(",");
+            CHAR_NOTNULL_RE = bundle.getString("column.char.notnull.re");
+            GRID_ROWS = bundle.getString("grid.rows");
+            VIEW_CRITERIA_PREFIXS = bundle.getString("view.criteria.prefix").split(",");
+            VIEW_DETAIL = bundle.getString("view.detail");
+            INPUT_READONLY_SUFFIXS = bundle.getString("input.readonly.suffixs").split(",");
+            INPUT_YM_SUFFIXS = bundle.getString("input.ym.suffixs").split(",");
+            INPUT_DATE8_SUFFIXS = bundle.getString("input.date8.suffixs").split(",");
+            TS_SUFS = bundle.getString("input.timestamp.suffixs").split(",");
+            inputNumberSuffixs = bundle.getString("input.number.suffixs").split(",");
+            INPUT_DATETIME_SUFFIXS = bundle.getString("input.datetime.suffixs").split(",");
+            INPUT_DATE_SUFFIXS = bundle.getString("input.date.suffixs").split(",");
+            INPUT_HOUR_SUFFIXS = bundle.getString("input.hour.suffixs").split(",");
+            INPUT_TIME_SUFFIXS = bundle.getString("input.time.suffixs").split(",");
+            INPUT_FLAG_SUFFIXS = bundle.getString("input.flag.suffixs").split(",");
+            INPUT_BIT_SUFFIXS = bundle.getString("input.bit.suffixs").split(",");
+            FILE_SUFS = bundle.getString("input.file.suffixs").split(",");
+            OPTIONS_SUFFIXS = bundle.getString("input.options.suffixs").split(",");
+            TEXTAREA_SUFFIXS = bundle.getString("input.textarea.suffixs").split(",");
+            JSON = bundle.getString("options.json");
+            OPT_K = bundle.getString("options.key").toUpperCase();
+            OPT_V = bundle.getString("options.value").toUpperCase();
+            OPT_L = bundle.getString("options.label").toUpperCase();
+
         }
-        TEKIYO_BI = bundle.getString("column.start");
-        HAISHI_BI = bundle.getString("column.until");
-        UPDATE_TS = bundle.getString("column.update.timestamp");
-        STATUS = bundle.getString("column.status");
-        DELETE_F = bundle.getString("column.delete");
-        REASON = bundle.getString("column.reason");
-        INT_NOFORMAT_SUFFIXS = bundle.getString("column.int.noformat.suffixs").split(",");
-        CHAR_NOTNULL_RE = bundle.getString("column.char.notnull.re");
-        GRID_ROWS = bundle.getString("grid.rows");
-        VIEW_CRITERIA_PREFIXS = bundle.getString("view.criteria.prefix").split(",");
-        VIEW_DETAIL = bundle.getString("view.detail");
-        INPUT_READONLY_SUFFIXS = bundle.getString("input.readonly.suffixs").split(",");
-        INPUT_YM_SUFFIXS = bundle.getString("input.ym.suffixs").split(",");
-        INPUT_DATE8_SUFFIXS = bundle.getString("input.date8.suffixs").split(",");
-        TS_SUFS = bundle.getString("input.timestamp.suffixs").split(",");
-        inputNumberSuffixs = bundle.getString("input.number.suffixs").split(",");
-        INPUT_DATETIME_SUFFIXS = bundle.getString("input.datetime.suffixs").split(",");
-        INPUT_DATE_SUFFIXS = bundle.getString("input.date.suffixs").split(",");
-        INPUT_HOUR_SUFFIXS = bundle.getString("input.hour.suffixs").split(",");
-        INPUT_TIME_SUFFIXS = bundle.getString("input.time.suffixs").split(",");
-        INPUT_FLAG_SUFFIXS = bundle.getString("input.flag.suffixs").split(",");
-        INPUT_BIT_SUFFIXS = bundle.getString("input.bit.suffixs").split(",");
-        FILE_SUFS = bundle.getString("input.file.suffixs").split(",");
-        OPTIONS_SUFFIXS = bundle.getString("input.options.suffixs").split(",");
-        TEXTAREA_SUFFIXS = bundle.getString("input.textarea.suffixs").split(",");
-        JSON = bundle.getString("options.json");
-        OPT_K = bundle.getString("options.key").toUpperCase();
-        OPT_V = bundle.getString("options.value").toUpperCase();
-        OPT_L = bundle.getString("options.label").toUpperCase();
     }
 
     /** プライベートコンストラクタ */
@@ -186,34 +225,39 @@ public abstract class HtmlGenerator {
      */
     static void generate(final String projectDir, final List<TableInfo> tables) {
 
-        youngestRe = bundle.getString("relation.youngest.re");
+        if (bundle != null) {
 
-        String[] ganttDefs = bundle.getString("gantt.columns").split(",");
-        for (String ganttDef : ganttDefs) {
-            String[] columns = ganttDef.split(":");
-            ganttColumns.add(columns);
-        }
+            youngestRe = bundle.getString("relation.youngest.re");
 
-        navIgnoreRe = bundle.getString("nav.ignore.re");
-
-        inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
-        pulldownSuffixs = bundle.getString("input.pulldown.suffixs").split(",");
-
-        // 業務並び順
-        for (String key : bundle.keySet()) {
-            if (key.startsWith("nav.order.prefix.re.")) {
-                String order = key.replaceFirst("nav.order.prefix.re.", "");
-                String re = bundle.getString(key);
-                navOrderRes.put(order, re);
+            String[] ganttDefs = bundle.getString("gantt.columns").split(",");
+            for (String ganttDef : ganttDefs) {
+                String[] columns = ganttDef.split(":");
+                ganttColumns.add(columns);
             }
+
+            navIgnoreRe = bundle.getString("nav.ignore.re");
+
+            inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
+            pulldownSuffixs = bundle.getString("input.pulldown.suffixs").split(",");
+
+            // 業務並び順
+            for (String key : bundle.keySet()) {
+                if (key.startsWith("nav.order.prefix.re.")) {
+                    String order = key.replaceFirst("nav.order.prefix.re.", "");
+                    String re = bundle.getString(key);
+                    navOrderRes.put(order, re);
+                }
+            }
+            dirHtml = bundle.getString("dir.html");
+            dirGrid = bundle.getString("dir.grid");
         }
 
         // 出力フォルダを再作成
-        String htmlDir = projectDir + File.separator + bundle.getString("dir.html");
+        String htmlDir = projectDir + File.separator + dirHtml;
         FileUtil.reMkDir(htmlDir);
         FileUtil.reMkDir(htmlDir + File.separator + ".." + File.separator + "common");
 
-        String gridDir = projectDir + File.separator + bundle.getString("dir.grid");
+        String gridDir = projectDir + File.separator + dirGrid;
         FileUtil.reMkDir(gridDir);
 
         for (TableInfo table : tables) {
@@ -441,11 +485,22 @@ public abstract class HtmlGenerator {
             return true;
         }
 
-        // 転生元/*か派生元*/が必須なら作成不可
+        // 転生元が必須なら作成不可
         for (ColumnInfo column : table.getColumns().values()) {
-            if ((column.isReborn() /* || column.isDerive() */) && column.getNullable() != 1) {
+            if (column.isReborn() && column.getNullable() != 1) {
                 return false;
             }
+        }
+
+        // 必須の派生元が１つしかなければ作成不可（複数転生先の対応）
+        int derives = 0;
+        for (ColumnInfo column : table.getColumns().values()) {
+            if (column.getDeriveFrom() != null && column.getNullable() != 1) {
+                derives++;
+            }
+        }
+        if (derives == 1) {
+            return false;
         }
 
         // 適用日を除く主キーが、一つなら作成可
@@ -1150,13 +1205,13 @@ public abstract class HtmlGenerator {
                 addMeiSpan(s, t, c, "");
             } else if (isD && c.isReborn()) { // 詳細画面の転生元外部キー
                 htmlFieldsSpan(s, fId, c, "rebornee");
-            } else if (isD && c.getDeriveFrom() != null) { // 詳細画面の派生元外部キー
+            } else if (isD && ((c.getDeriveFrom() != null && c.getNullable() != 1) || (c.isReborn()))) { // 詳細画面で、必須の派生元外部キーか転生キー
                 String css = "derivee";
                 if (t.getSummaryOfs().size() > 0) {
                     css += " summaryOf";
                 }
                 htmlFieldsSpan(s, fId, c, css);
-                if (!isP && t.getSummaryOfs().size() == 0 && c.getNullable() == 1) { // NOTNULLなら派生元参照リンクを出さない
+                if (!isP && t.getSummaryOfs().size() == 0 && c.getNullable() == 1) { // 親モデルでなく集約モデルでなく任意項目なら選択リンクを表示
                     s.add(getCorrectLink(fId, StringUtil.toPascalCase(c.getDeriveFrom().getName()), css));
                 }
             } else if (isD && c.isSummary()) { // 詳細画面の集約先外部キー

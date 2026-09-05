@@ -39,7 +39,7 @@ public final class SqlGenerator {
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
     /** 長兄 */
-    private static String eldestRe;
+    private static String eldestRe = "";
     /** 参照列名ペア */
     private static Set<String[]> referPairs = new LinkedHashSet<String[]>();
 
@@ -77,6 +77,9 @@ public final class SqlGenerator {
     /** DataSourcesAssist */
     private static DataSourcesAssist assist = DataSources.getAssist();
 
+    /**  */
+    private static String dirSql = "src\\main\\resources\\sql";
+
     /** プライベートコンストラクタ */
     private SqlGenerator() {
     }
@@ -89,32 +92,37 @@ public final class SqlGenerator {
     public static void generate(final String projectDir, final List<TableInfo> tableInfos) {
 
         /* 設定ファイル読み込み */
-        eldestRe = bundle.getString("relation.eldest.re");
-        String[] pairs = bundle.getString("relation.refer.pairs").split(",");
-        for (String pair : pairs) {
-            String[] kv = pair.split(":");
-            referPairs.add(kv);
+        if (bundle != null) {
+
+            eldestRe = bundle.getString("relation.eldest.re");
+            String[] pairs = bundle.getString("relation.refer.pairs").split(",");
+            for (String pair : pairs) {
+                String[] kv = pair.split(":");
+                referPairs.add(kv);
+            }
+
+            start = bundle.getString("column.start").toUpperCase();
+            until = bundle.getString("column.until").toUpperCase();
+            updateTs = bundle.getString("column.update.timestamp");
+            deleteF = bundle.getString("column.delete").toUpperCase();
+            orderSuffixs = bundle.getString("column.order.suffixs").split(",");
+            viewDetail = bundle.getString("view.detail");
+
+            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
+            inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
+            inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
+            inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
+            inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
+            inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
+            inputOptionsSuffixs = bundle.getString("input.options.suffixs").split(",");
+
+            optK = bundle.getString("options.key").toUpperCase();
+
+            dirSql = bundle.getString("dir.sql");
         }
 
-        start = bundle.getString("column.start").toUpperCase();
-        until = bundle.getString("column.until").toUpperCase();
-        updateTs = bundle.getString("column.update.timestamp");
-        deleteF = bundle.getString("column.delete").toUpperCase();
-        orderSuffixs = bundle.getString("column.order.suffixs").split(",");
-        viewDetail = bundle.getString("view.detail");
-
-        inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-        inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
-        inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
-        inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
-        inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
-        inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
-        inputOptionsSuffixs = bundle.getString("input.options.suffixs").split(",");
-
-        optK = bundle.getString("options.key").toUpperCase();
-
         //SQLフォルダ
-        String sqlDir = projectDir + File.separator + bundle.getString("dir.sql");
+        String sqlDir = projectDir + File.separator + dirSql;
         FileUtil.reMkDir(sqlDir);
 
         //検索SQL
