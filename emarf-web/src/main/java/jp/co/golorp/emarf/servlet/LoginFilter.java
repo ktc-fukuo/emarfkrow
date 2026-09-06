@@ -177,24 +177,19 @@ public class LoginFilter implements Filter {
 
                 Map<String, Object> postJson = ServletUtil.suckParameterMap(req);
 
+                Class<?> c = null;
+                try {
+                    c = Class.forName(pkgA + ".LoginAction");
+                } catch (ClassNotFoundException e) {
+                    throw new SysError(e);
+                }
+
                 Map<String, Object> map = null;
 
                 try {
-                    Class<?> c = null;
-                    try {
-                        c = Class.forName(pkgA + ".LoginAction");
-                    } catch (ClassNotFoundException e) {
-                        LOG.warn(e.getMessage(), e);
-                        ses.setAttribute(LoginFilter.AUTHN_KEY, "");
-                    }
                     if (c != null) {
                         BaseAction action = (BaseAction) c.getDeclaredConstructor().newInstance();
                         map = action.run(postJson);
-                        ses.setAttribute(LoginFilter.AUTHN_KEY, map.get(LoginFilter.AUTHN_KEY));
-                        ses.setAttribute(LoginFilter.AUTHN_MEI, map.get(LoginFilter.AUTHN_MEI));
-                        ses.setAttribute(LoginFilter.AUTHN_INFO, map.get(LoginFilter.AUTHN_INFO));
-                        ses.setAttribute(LoginFilter.AUTHZ_INFO, map.get(LoginFilter.AUTHZ_INFO));
-                        ses.setAttribute(LoginFilter.LOGIN_FORM, map.get(LoginFilter.LOGIN_FORM));
                     }
                 } catch (AppError e) {
                     LOG.error(e.getMessage(), e);
@@ -204,6 +199,12 @@ public class LoginFilter implements Filter {
                     LOG.error(e.getMessage(), e);
                     throw new SysError(e);
                 }
+
+                ses.setAttribute(LoginFilter.AUTHN_KEY, map.get(LoginFilter.AUTHN_KEY));
+                ses.setAttribute(LoginFilter.AUTHN_MEI, map.get(LoginFilter.AUTHN_MEI));
+                ses.setAttribute(LoginFilter.AUTHN_INFO, map.get(LoginFilter.AUTHN_INFO));
+                ses.setAttribute(LoginFilter.AUTHZ_INFO, map.get(LoginFilter.AUTHZ_INFO));
+                ses.setAttribute(LoginFilter.LOGIN_FORM, map.get(LoginFilter.LOGIN_FORM));
 
                 String orgRequestURI = StringUtil.sanitize(request.getParameter("requestURI"));
                 if (!StringUtil.isNullOrWhiteSpace(orgRequestURI)) {

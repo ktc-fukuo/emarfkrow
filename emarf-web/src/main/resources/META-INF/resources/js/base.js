@@ -398,9 +398,9 @@ let Base = {
             // 認可設定を取得
             let authzInfo = JSON.parse(sessionStorage['authzInfo']);
 
-            // 認可スキップなら「9」を返す
+            // 認可スキップなら空白を返す
             if (authzInfo['authz'] && authzInfo['authz'] == 'false') {
-                return 255;
+                return '';
             }
 
             // 認可済みメッセージがある場合は取得

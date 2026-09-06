@@ -22,6 +22,7 @@ import java.util.Map;
 
 import jakarta.servlet.http.HttpSession;
 
+import jp.co.golorp.emarf.lang.StringUtil;
 import jp.co.golorp.emarf.sql.Queries;
 import jp.co.golorp.emarf.util.MapList;
 import jp.co.golorp.emarf.util.Messages;
@@ -44,8 +45,12 @@ public class SearchAction extends BaseAction {
         Integer rows = null;
         Integer page = null;
         if (postedJson.containsKey("rows")) {
-            rows = Integer.valueOf(postedJson.get("rows").toString());
-            page = Integer.valueOf(postedJson.get("page").toString());
+            if (!StringUtil.isNullOrWhiteSpace(postedJson.get("rows"))) {
+                rows = Integer.valueOf(postedJson.get("rows").toString());
+            }
+            if (!StringUtil.isNullOrWhiteSpace(postedJson.get("page"))) {
+                page = Integer.valueOf(postedJson.get("page").toString());
+            }
 
             HttpSession ses = this.getSession();
             String requestURI = this.getRequestURI();
