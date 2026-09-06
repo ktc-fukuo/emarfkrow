@@ -1131,6 +1131,9 @@ public abstract class HtmlGenerator {
         }
         String e = StringUtil.toPascalCase(t.getName());
         for (ColumnInfo c : t.getColumns().values()) { // カラム情報でループ
+            if (c.getColumnSize() == 0) {
+                continue; // VIEWでNULLを当てている場合はスキップ
+            }
             String cNm = c.getName();
             if ((isB && c.isPk()) || cNm.matches("(?i)^" + VIEW_DETAIL + "$")) {
                 continue; // 兄弟モデルの主キー と VIEWの「TABLE_NAME」なら出力しない
@@ -1148,8 +1151,7 @@ public abstract class HtmlGenerator {
             if (BeanGenerator.isMetaTsBy(cNm)) {
                 if (!isD) {
                     continue; // メタ情報の場合検索画面ならスキップ（検索条件にはしない）
-                }
-                if (isB) {
+                } else if (isB) {
                     if (cNm.matches("(?i)^" + UPDATE_TS + "$")) {
                         s.add("        <input type=\"hidden\" name=\"" + e + "." + p + "\" />");
                     }
