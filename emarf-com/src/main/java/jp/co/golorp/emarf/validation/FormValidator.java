@@ -62,6 +62,15 @@ public final class FormValidator {
     /** BeanGenerator.properties */
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
+    /***/
+    private static String reason = "";
+
+    static {
+        if (bundle != null) {
+            reason = bundle.getString("column.reason");
+        }
+    }
+
     /** プライベートコンストラクタ */
     private FormValidator() {
     }
@@ -207,7 +216,6 @@ public final class FormValidator {
         } catch (Exception e) {
             throw new SysError(e);
         }
-        String reason = bundle.getString("column.reason");
         Method[] methods = clazz.getMethods(); // フォームクラスインスタンスのセッターでループ
         for (Method method : methods) {
             String methodName = method.getName();

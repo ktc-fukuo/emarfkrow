@@ -165,8 +165,10 @@ public class MessageResolver extends StandardMessageResolver {
             combinedMessages = new HashMap<String, String>();
         }
 
-        for (String key : bundle.keySet()) {
-            combinedMessages.put(key, bundle.getString(key));
+        if (bundle != null) {
+            for (String key : bundle.keySet()) {
+                combinedMessages.put(key, bundle.getString(key));
+            }
         }
 
         return Collections.unmodifiableMap(combinedMessages);

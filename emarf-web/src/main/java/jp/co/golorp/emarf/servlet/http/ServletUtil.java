@@ -77,6 +77,15 @@ public final class ServletUtil {
     /** BeanGenerator.properties */
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
+    /***/
+    private static String pkgA = "com.example.action";
+
+    static {
+        if (bundle != null) {
+            pkgA = bundle.getString("java.package.action");
+        }
+    }
+
     /** servletUrl */
     private static String servletUrl;
 
@@ -139,13 +148,12 @@ public final class ServletUtil {
     private static BaseAction extracted(final HttpServletRequest request, final String[] servletPathes,
             final String actionName) {
 
-        String pkg = bundle.getString("java.package.action");
         BaseAction a = null;
 
         try {
 
             // リクエストに則って、拡張アクションを取ってみる
-            String className = pkg;
+            String className = pkgA;
             if (servletPathes != null) {
                 className += String.join(".", servletPathes);
             }
@@ -155,14 +163,14 @@ public final class ServletUtil {
             try {
 
                 // モデルパッケージからも、拡張アクションを取ってみる
-                String className = pkg + ".model." + actionName;
+                String className = pkgA + ".model." + actionName;
                 a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
 
             } catch (Exception e1) {
                 try {
 
                     // モデルのベースパッケージからも、基底アクションを取ってみる
-                    String className = pkg + ".model.base." + actionName;
+                    String className = pkgA + ".model.base." + actionName;
                     a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
 
                 } catch (Exception e2) {

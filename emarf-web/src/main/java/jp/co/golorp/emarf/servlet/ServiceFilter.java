@@ -75,6 +75,15 @@ public class ServiceFilter implements Filter {
     /** サービスエラーページ */
     private static final String ERROR_PAGE = App.get("servicefilter.error.page");
 
+    /***/
+    private static String pkgA = "com.example.action";
+
+    static {
+        if (bundle != null) {
+            pkgA = bundle.getString("java.package.action");
+        }
+    }
+
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
 
@@ -135,7 +144,7 @@ public class ServiceFilter implements Filter {
 
             Class<?> c = null;
             try {
-                c = Class.forName(bundle.getString("java.package.action") + ".ServiceAction");
+                c = Class.forName(pkgA + ".ServiceAction");
             } catch (ClassNotFoundException e) {
                 LOG.trace("ServiceAction is not found.");
             }
