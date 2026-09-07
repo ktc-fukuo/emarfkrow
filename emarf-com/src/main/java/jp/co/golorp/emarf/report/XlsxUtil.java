@@ -68,7 +68,9 @@ public final class XlsxUtil {
     private static String[] optionsSuffixs;
 
     static {
-        optionsSuffixs = bundle.getString("input.options.suffixs").split(",");
+        if (bundle != null) {
+            optionsSuffixs = bundle.getString("input.options.suffixs").split(",");
+        }
     }
 
     /** プライベートコンストラクタ */

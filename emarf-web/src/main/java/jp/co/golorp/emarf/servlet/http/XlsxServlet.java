@@ -55,11 +55,17 @@ public final class XlsxServlet extends HttpServlet {
     /** BeanGenerator.properties */
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
+    /***/
+    private static String pkgA = "com.example.action";
+
     /**
      * @see HttpServlet#HttpServlet()
      */
     public XlsxServlet() {
         super();
+        if (bundle != null) {
+            pkgA = bundle.getString("java.package.action");
+        }
     }
 
     /**
@@ -101,7 +107,7 @@ public final class XlsxServlet extends HttpServlet {
         String lastPath = servletPathes[servletPathes.length - 1];
         String actionName = lastPath.replaceFirst(".[a-z]+$", "") + "XlsxAction";
         servletPathes[servletPathes.length - 1] = actionName;
-        String className = bundle.getString("java.package.action") + String.join(".", servletPathes);
+        String className = pkgA + String.join(".", servletPathes);
         try {
             Class<?> c = Class.forName(className);
             xlsxAction = (BaseAction) c.getDeclaredConstructor().newInstance();

@@ -257,20 +257,21 @@ $(function() {
                         gridLinkTitleWidth = new Blob([gridLinkTitle]).size * 7;
                     }
 
-                    //                    // 固定列がある場合（主キーが１つ以上ある場合）
-                    //                    if ($gridDiv.attr('data-frozenColumn') * 1 >= 0) {
-                    // 詳細リンク列を追加
-                    columns.unshift({
-                        id: 'link',
-                        name: gridLinkTitle,
-                        field: 'field',
-                        sortable: true,
-                        width: gridLinkTitleWidth,
-                        label: Messages['common.grid.link.label'],
-                        formatter: Slick.Formatters.Extends.Link
-                    });
-                    ++frozenColumnAdd;
-                    //                    }
+                    // 固定列がある（主キーが１つ以上）か、「TABLE_NAME」列がある場合
+                    if ($gridDiv.attr('data-frozenColumn') * 1 >= 0 || columns[columnDetail]) {
+
+                        // 詳細リンク列を追加
+                        columns.unshift({
+                            id: 'link',
+                            name: gridLinkTitle,
+                            field: 'field',
+                            sortable: true,
+                            width: gridLinkTitleWidth,
+                            label: Messages['common.grid.link.label'],
+                            formatter: Slick.Formatters.Extends.Link
+                        });
+                        ++frozenColumnAdd;
+                    }
                 }
 
                 // checkbox指定で、ダイアログ内でないなら、最左列にチェックボックス列を追加
@@ -281,7 +282,7 @@ $(function() {
                         checkboxSelectColumn = new Slick.CheckboxSelectColumn({
                             selectableOverride: function(row, dataContext, grid) {
                                 let dataItem = dataContext;
-                                if (dataItem[columnRegistTs.toLowerCase()] || dataItem[columnRegistTs.toUpperCase()]) {
+                                if (columnRegistTs != undefined && (dataItem[columnRegistTs.toLowerCase()] || dataItem[columnRegistTs.toUpperCase()])) {
                                     var UID = Math.round(10000000 * Math.random()) + row;
                                     return dataContext
                                         ? "<input id='selector" + UID + "' type='checkbox' checked='checked'><label for='selector" + UID + "'></label>"
@@ -1120,7 +1121,7 @@ var Gridate = {
         // TABLE_NAME列の検査
         let tableName = null;
         for (let columnName in item) {
-            if (columnName.toUpperCase() == columnDetail.toUpperCase()) {
+            if (columnDetail != undefined && columnName.toUpperCase() == columnDetail.toUpperCase()) {
                 tableName = item[columnName];
                 break;
             }
@@ -1256,12 +1257,12 @@ var Gridate = {
     isReadonly: function($clicked, dataItem, grid, r, c) {
 
         //ステータス区分列なら非活性
-        if (grid.getColumns()[c].field == columnStatus.toLowerCase() || grid.getColumns()[c].field == columnStatus.toUpperCase()) {
+        if (columnStatus != undefined && (grid.getColumns()[c].field == columnStatus.toLowerCase() || grid.getColumns()[c].field == columnStatus.toUpperCase())) {
             return true;
         }
 
         //        if (!dataItem || dataItem.isNew) { 初期表示の１行目や選択サブで効かなくなる
-        if (!dataItem || (!dataItem[columnRegistTs.toLowerCase()] && !dataItem[columnRegistTs.toUpperCase()])) {
+        if (!dataItem || (columnRegistTs != undefined && !dataItem[columnRegistTs.toLowerCase()] && !dataItem[columnRegistTs.toUpperCase()])) {
             //新規行の場合
 
             //採番キーなら非活性
@@ -1278,7 +1279,7 @@ var Gridate = {
             }
 
             //ステータス区分が「1」以上なら非活性
-            if (dataItem[columnStatus.toLowerCase()] >= 1 || dataItem[columnStatus.toUpperCase()] >= 1) {
+            if (columnStatus != undefined && (dataItem[columnStatus.toLowerCase()] >= 1 || dataItem[columnStatus.toUpperCase()] >= 1)) {
                 return true;
             }
         }

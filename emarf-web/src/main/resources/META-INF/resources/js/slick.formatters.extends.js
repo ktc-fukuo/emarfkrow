@@ -78,10 +78,10 @@ limitations under the License.
         if (columnUntil.toLowerCase() in dataContext || columnUntil.toUpperCase() in dataContext) {
             return null;
         }
-		// ステータスがあれば削除ボタン非表示
-		if (dataContext[columnStatus.toLowerCase()] || dataContext[columnStatus.toUpperCase()]) {
-		    return null;
-		}
+        // ステータスがあれば削除ボタン非表示
+        if (dataContext[columnStatus.toLowerCase()] || dataContext[columnStatus.toUpperCase()]) {
+            return null;
+        }
         if (columnDef.label) {
             return '<input type="button" value="' + columnDef.label + '" class="gridButton gridDelete" />';
         }
@@ -119,8 +119,8 @@ limitations under the License.
     }
 
     function LinkFormatter(row, cell, value, columnDef, dataContext) {
-        if (!dataContext[columnRegistTs.toLowerCase()] && !dataContext[columnRegistTs.toUpperCase()] &&
-            !dataContext[columnDetail.toLowerCase()] && !dataContext[columnDetail.toUpperCase()]) {
+        if ((columnRegistTs != undefined && !dataContext[columnRegistTs.toLowerCase()] && !dataContext[columnRegistTs.toUpperCase()]) &&
+            columnDetail != undefined && !dataContext[columnDetail.toLowerCase()] && !dataContext[columnDetail.toUpperCase()]) {
             return null;
         }
         if (value) {
