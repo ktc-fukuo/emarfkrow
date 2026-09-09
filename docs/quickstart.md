@@ -19,6 +19,7 @@ git clone https://github.com/emarfkrow/sample.git
 - emarf-com：システム共通
 - emarf-job：バッチ共通
 - emarf-web：ウェブ共通
+- blank    ：ZERO-Config版
 - samplecom：サンプル共通（自動生成させるプロジェクト）
 - samplejob：バッチサンプル
 - sampleweb：ウェブサンプル
@@ -33,6 +34,14 @@ emarf-com
                 ├ samplejob
                 └ sampleweb
 ```
+
+blankプロジェクトはデータソースのみ任意のDBに設定してjp.co.golorp.emarf.Appを実行すればすぐに動くものが確認できます。
+
+```
+emarf-com
+└ emarf-web ─ blank
+```
+
 
 ---
 
