@@ -30,49 +30,18 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.golorp.emarf.io.FileUtil;
 import jp.co.golorp.emarf.lang.StringUtil;
-import jp.co.golorp.emarf.properties.App;
 import jp.co.golorp.emarf.util.ResourceBundles;
 
 /**
  * フォーム出力
  */
-public final class FormGenerator {
+public final class FormGenerator extends BeanGenerator {
 
     /** logger */
     private static final Logger LOG = LoggerFactory.getLogger(FormGenerator.class);
 
     /** BeanGenerator.properties */
     private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
-
-    /** formパッケージ */
-    private static String pkgF = "com.example.form.model.base";
-
-    /** javaファイル出力ルートパス */
-    private static String javaDir = "src\\main\\java";
-
-    /** プロジェクトディレクトリ */
-    private static String projectDir;
-
-    /** 適用日カラム名 */
-    private static String tekiyoBi;
-    /** 更新日時カラム名 */
-    private static String updateTs;
-
-    /** フラグサフィックス */
-    private static String[] inputFlagSuffixs;
-
-    /** 起動時の自動生成か */
-    private static boolean isGenerateAtStartup;
-
-    /** validサフィックス */
-    private static List<String> validSuffixs;
-
-    /** 必須CHAR列の指定 */
-    private static String charNotNullRe;
-    /** 非必須INT列の指定 */
-    private static String numberNullableRe;
-    /** タイムスタンプサフィックス */
-    private static String[] inputTimestampSuffixs;
 
     /**
      * プライベートコンストラクタ
@@ -82,46 +51,13 @@ public final class FormGenerator {
 
     /**
      * 各ファイル出力 主処理
-     * @param dir プロジェクトのディレクトリ
      * @param tables
      */
-    public static void generate(final String dir, final List<TableInfo> tables) {
-
-        projectDir = dir;
-
-        //webからの自動生成ならコンパイルまで行う
-        if (App.get("generateAtStartup") != null) {
-            isGenerateAtStartup = App.get("generateAtStartup").toLowerCase().equals("true");
-        }
-
-        validSuffixs = new ArrayList<String>();
-        if (bundle != null) {
-
-            pkgF = bundle.getString("java.package.form") + ".model.base";
-            javaDir = bundle.getString("dir.java");
-            tekiyoBi = bundle.getString("column.start");
-            updateTs = bundle.getString("column.update.timestamp");
-
-            inputFlagSuffixs = bundle.getString("input.flag.suffixs").split(",");
-
-            //validator正規表現の接尾辞を取得
-            for (String key : bundle.keySet()) {
-                if (key.startsWith("valid.")) {
-                    validSuffixs.add(key.replaceFirst("valid.", ""));
-                }
-            }
-
-            //NOTNULLで必須項目として扱うCHARの列名リスト（ホストの△対応）
-            charNotNullRe = bundle.getString("column.char.notnull.re");
-            //NOTNULLのINT列で「0」を補填する列名指定
-            numberNullableRe = bundle.getString("column.number.nullable.re");
-            //タイムスタンプサフィックス
-            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-        }
+    public static void generate(final List<TableInfo> tables) {
 
         //フォームフォルダ
-        String pkgFormPath = pkgF.replace(".", File.separator);
-        String pkgFormDir = projectDir + File.separator + javaDir + File.separator + pkgFormPath;
+        String pkgFormPath = PKG_F.replace(".", File.separator);
+        String pkgFormDir = getProjectDir() + File.separator + DIR_J + File.separator + pkgFormPath;
         FileUtil.reMkDir(pkgFormDir);
 
         FormGenerator.javaFormDetailRegist(tables);
@@ -133,8 +69,8 @@ public final class FormGenerator {
      * @param tableInfos テーブル情報のリスト
      */
     private static void javaFormDetailRegist(final List<TableInfo> tableInfos) {
-        String packagePath = pkgF.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_F.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tableInfos) {
             if (table.isHistory() || table.isView() || table.isStatusFlow()) {
@@ -142,7 +78,7 @@ public final class FormGenerator {
             }
             String entity = StringUtil.toPascalCase(table.getName());
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgF + ";");
+            s.add("package " + PKG_F + ";");
             addImports(s);
             addAuthor(s, table.getRemarks() + "登録フォーム");
             s.add("public class " + entity + "RegistForm implements IForm {");
@@ -151,7 +87,7 @@ public final class FormGenerator {
             s.add("    private static final Logger LOG = LoggerFactory.getLogger(" + entity + "RegistForm.class);");
             for (ColumnInfo column : table.getColumns().values()) {
                 // レコードメタデータならスキップ。updateDtは楽観ロック用に必要
-                boolean isUpdTs = column.getName().matches("(?i)^" + updateTs + "$");
+                boolean isUpdTs = column.getName().matches("(?i)^" + UPDATE_AT + "$");
                 if (!isUpdTs && BeanGenerator.isMetaTsBy(column.getName())) {
                     continue;
                 }
@@ -162,7 +98,7 @@ public final class FormGenerator {
                 javaFormDetailRegistChecks(s, table, column);
 
                 if (column.getNullable() == 1) {
-                    if (StringUtil.endsWith(inputFlagSuffixs, column.getName())) {
+                    if (StringUtil.endsWith(INPUT_F_SUFS, column.getName())) {
                         s.add("    private String " + prop + " = \"0\";");
                     } else {
                         s.add("    private String " + prop + ";");
@@ -177,7 +113,7 @@ public final class FormGenerator {
                 s.add("    /** @return " + column.getRemarks() + " */");
                 if (column.isPk()) {
                     s.add("    @jp.co.golorp.emarf.validation.PrimaryKeys");
-                } else if (column.getName().matches("(?i)^" + updateTs + "$")) {
+                } else if (column.getName().matches("(?i)^" + UPDATE_AT + "$")) {
                     s.add("    @jp.co.golorp.emarf.validation.OptLock");
                 }
                 s.add("    public String get" + acce + "() {");
@@ -187,7 +123,7 @@ public final class FormGenerator {
                 s.add("    /** @param p " + column.getRemarks() + " */");
                 if (column.isPk()) {
                     s.add("    @jp.co.golorp.emarf.validation.PrimaryKeys");
-                } else if (column.getName().matches("(?i)^" + updateTs + "$")) {
+                } else if (column.getName().matches("(?i)^" + UPDATE_AT + "$")) {
                     s.add("    @jp.co.golorp.emarf.validation.OptLock");
                 }
                 s.add("    public void set" + acce + "(final String p) {");
@@ -237,10 +173,10 @@ public final class FormGenerator {
             javaFormDetailRegistRelCheck(table, s);
             s.add("}");
             String javaFilePath = packageDir + File.separator + entity + "RegistForm.java";
-            javaFilePaths.put(javaFilePath, pkgF + "." + entity + "RegistForm");
+            javaFilePaths.put(javaFilePath, PKG_F + "." + entity + "RegistForm");
             FileUtil.writeFile(javaFilePath, s);
         }
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -431,7 +367,7 @@ public final class FormGenerator {
 
         // 適用日以外の主キー
         List<String> koKeys = new ArrayList<String>(table.getPrimaryKeys());
-        koKeys.remove(tekiyoBi);
+        koKeys.remove(TEKIYO_BI);
 
         String colName = column.getName();
         String registGroup = "groups = jp.co.golorp.emarf.validation.Regist.class";
@@ -459,18 +395,18 @@ public final class FormGenerator {
                 LOG.trace("skip NotBlank.");
 
             } else if (!column.isPk() && column.getTypeName().equals("CHAR")
-                    && !StringUtil.isNullOrWhiteSpace(charNotNullRe) && !colName.matches(charNotNullRe)) {
+                    && !StringUtil.isNullOrWhiteSpace(CHAR_NOTNULL_RE) && !colName.matches(CHAR_NOTNULL_RE)) {
 
                 // 主キー以外のCHAR列で、必須CHAR指定に合致しない場合、NULLならスペースを補填する
                 LOG.trace("skip NotBlank.");
 
             } else if (!column.isPk() && column.getTypeName().equals("NUMBER")
-                    && !StringUtil.isNullOrWhiteSpace(numberNullableRe) && colName.matches(numberNullableRe)) {
+                    && !StringUtil.isNullOrWhiteSpace(NUMBER_NULLABLE_RE) && colName.matches(NUMBER_NULLABLE_RE)) {
 
                 // 主キー以外のNUMBER列で、非必須INT指定に合致する場合、NULLなら「0」を補填する
                 LOG.trace("skip NotBlank.");
 
-            } else if (StringUtil.endsWith(inputTimestampSuffixs, colName)) {
+            } else if (StringUtil.endsWith(INPUT_TS_SUFS, colName)) {
 
                 // タイムスタンプならスキップ
                 LOG.trace("skip NotBlank.");
@@ -488,7 +424,7 @@ public final class FormGenerator {
 
         int matchLength = 0;
         String validSuffix = null;
-        for (String suffix : validSuffixs) {
+        for (String suffix : VALID_SUFS) {
             Pattern pattern = Pattern.compile("(?i).*(" + suffix + ")$");
             Matcher matcher = pattern.matcher(colName);
             if (matcher.find()) {
@@ -542,7 +478,7 @@ public final class FormGenerator {
 
         if (column.isPk()) {
             s.add("    @jp.co.golorp.emarf.validation.PrimaryKeys");
-        } else if (column.getName().matches("(?i)^" + updateTs + "$")) {
+        } else if (column.getName().matches("(?i)^" + UPDATE_AT + "$")) {
             s.add("    @jp.co.golorp.emarf.validation.OptLock");
         }
     }
@@ -554,8 +490,8 @@ public final class FormGenerator {
     private static void javaFormIndexRegist(final List<TableInfo> tableInfos) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgF.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_F.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
@@ -571,7 +507,7 @@ public final class FormGenerator {
             String instance = StringUtil.toCamelCase(tableName);
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgF + ";");
+            s.add("package " + PKG_F + ";");
             s.add("");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
@@ -624,12 +560,12 @@ public final class FormGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "SRegistForm.java";
-            javaFilePaths.put(javaFilePath, pkgF + "." + entity + "SRegistForm");
+            javaFilePaths.put(javaFilePath, PKG_F + "." + entity + "SRegistForm");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }

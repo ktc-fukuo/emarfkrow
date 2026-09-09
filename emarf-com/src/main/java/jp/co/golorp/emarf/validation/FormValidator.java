@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -378,6 +379,9 @@ public final class FormValidator {
         return isNotNullOrWhitespace;
     }
 
+    /** クラスキャッシュ */
+    private static ConcurrentHashMap<String, Class<?>> formCache = new ConcurrentHashMap<String, Class<?>>();
+
     /**
      * クラスを探索
      * @param className 対象クラス名
@@ -385,40 +389,61 @@ public final class FormValidator {
      */
     private static Class<?> forNameIf(final String className) {
 
+        if (formCache.containsKey(className)) {
+            return formCache.get(className);
+        }
+
         try {
 
             // そのままとってみる
-            return Class.forName(className);
+            Class<?> c = Class.forName(className);
+            formCache.put(className, c);
+            return c;
 
         } catch (ClassNotFoundException e) {
+
             try {
 
                 // modelパッケージのフォームクラスなら、baseパッケージまで掘ってみる
-                return Class.forName(className.replaceFirst("\\.model\\.", ".model.base."));
+                Class<?> c = Class.forName(className.replaceFirst("\\.model\\.", ".model.base."));
+                formCache.put(className, c);
+                return c;
 
             } catch (ClassNotFoundException e1) {
+
                 try {
 
                     // ***GridFormなら、***RegistFormにしてみる
-                    return Class.forName(className.replaceFirst("Grid", "Regist"));
+                    Class<?> c = Class.forName(className.replaceFirst("Grid", "Regist"));
+                    formCache.put(className, c);
+                    return c;
 
                 } catch (ClassNotFoundException e2) {
+
                     try {
 
                         // ***DeleteFormなら、***RegistFormにしてみる
-                        return Class.forName(className.replaceFirst("Delete", "Regist"));
+                        Class<?> c = Class.forName(className.replaceFirst("Delete", "Regist"));
+                        formCache.put(className, c);
+                        return c;
 
                     } catch (ClassNotFoundException e3) {
+
                         try {
 
                             // ***Gridなら、***RegistFormにしてみる
-                            return Class.forName(className.replaceFirst("Grid", "RegistForm"));
+                            Class<?> c = Class.forName(className.replaceFirst("Grid", "RegistForm"));
+                            formCache.put(className, c);
+                            return c;
 
                         } catch (ClassNotFoundException e4) {
+
                             try {
 
                                 // ***sなら、***にしてみる（カスタムフォームのグリッド本体用）
-                                return Class.forName(className.replaceFirst("s$", ""));
+                                Class<?> c = Class.forName(className.replaceFirst("s$", ""));
+                                formCache.put(className, c);
+                                return c;
 
                             } catch (ClassNotFoundException e5) {
                                 LOG.trace(e.toString());

@@ -33,7 +33,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -59,7 +58,6 @@ import jp.co.golorp.emarf.lang.StringUtil;
 import jp.co.golorp.emarf.properties.App;
 import jp.co.golorp.emarf.servlet.LoginFilter;
 import jp.co.golorp.emarf.time.DateTimeUtil;
-import jp.co.golorp.emarf.util.ResourceBundles;
 
 /**
  * サーブレット用ユーティリティ
@@ -70,21 +68,6 @@ public final class ServletUtil {
 
     /** logger */
     private static final Logger LOG = LoggerFactory.getLogger(ServletUtil.class);
-
-    //    /** アップロードファイル名称のサフィックス */
-    //    private static String uploadMeiSuffix = App.get("context.upload.mei.suffix");
-
-    /** BeanGenerator.properties */
-    private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
-
-    /***/
-    private static String pkgA = "com.example.action";
-
-    static {
-        if (bundle != null) {
-            pkgA = bundle.getString("java.package.action");
-        }
-    }
 
     /** servletUrl */
     private static String servletUrl;
@@ -153,7 +136,7 @@ public final class ServletUtil {
         try {
 
             // リクエストに則って、拡張アクションを取ってみる
-            String className = pkgA;
+            String className = BeanGenerator.PKG_A;
             if (servletPathes != null) {
                 className += String.join(".", servletPathes);
             }
@@ -163,14 +146,14 @@ public final class ServletUtil {
             try {
 
                 // モデルパッケージからも、拡張アクションを取ってみる
-                String className = pkgA + ".model." + actionName;
+                String className = BeanGenerator.PKG_A + ".model." + actionName;
                 a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
 
             } catch (Exception e1) {
                 try {
 
                     // モデルのベースパッケージからも、基底アクションを取ってみる
-                    String className = pkgA + ".model.base." + actionName;
+                    String className = BeanGenerator.PKG_A + ".model.base." + actionName;
                     a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
 
                 } catch (Exception e2) {

@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -44,7 +43,6 @@ import jp.co.golorp.emarf.properties.App;
 import jp.co.golorp.emarf.servlet.http.ServletUtil;
 import jp.co.golorp.emarf.time.DateTimeUtil;
 import jp.co.golorp.emarf.util.Messages;
-import jp.co.golorp.emarf.util.ResourceBundles;
 
 /**
  * サービス時間フィルタ
@@ -56,9 +54,6 @@ public class ServiceFilter implements Filter {
 
     /** ロガー */
     private static final Logger LOG = LoggerFactory.getLogger(ServiceFilter.class);
-
-    /** BeanGenerator.properties */
-    private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
 
     /** 除外URIの正規表現 */
     public static final String EXCLUDE_REGEXP = App.get("servicefilter.exclude.regexp");
@@ -75,18 +70,8 @@ public class ServiceFilter implements Filter {
     /** サービスエラーページ */
     private static final String ERROR_PAGE = App.get("servicefilter.error.page");
 
-    /***/
-    private static String pkgA = "com.example.action";
-
-    static {
-        if (bundle != null) {
-            pkgA = bundle.getString("java.package.action");
-        }
-    }
-
     @Override
     public void init(final FilterConfig filterConfig) throws ServletException {
-
     }
 
     /**
@@ -144,7 +129,7 @@ public class ServiceFilter implements Filter {
 
             Class<?> c = null;
             try {
-                c = Class.forName(pkgA + ".ServiceAction");
+                c = Class.forName(BeanGenerator.PKG_A + ".ServiceAction");
             } catch (ClassNotFoundException e) {
                 LOG.trace("ServiceAction is not found.");
             }

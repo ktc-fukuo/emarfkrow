@@ -15,6 +15,13 @@ limitations under the License.
 */
 package jp.co.golorp.emarf;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import jp.co.golorp.emarf.generator.BeanGenerator;
+import jp.co.golorp.emarf.util.ResourceBundles;
+
 /**
  * Hello world!
  *
@@ -27,7 +34,18 @@ public final class App {
      * @param args コマンドライン引数
      */
     public static void main(final String[] args) {
-        System.out.println("Hello World!");
+
+        //プロジェクトパスを取得
+        Path currentPath = Paths.get("");
+
+        //パスの文字列を取得
+        String absolutePath = currentPath.toAbsolutePath().toString();
+
+        //ソースパスにプロジェクトパスのリソースフォルダを追加
+        ResourceBundles.getSrcPaths().add(absolutePath + File.separator + "src\\main\\resources");
+
+        //ジェネレータ起動
+        BeanGenerator.generate(absolutePath);
     }
 
     /**

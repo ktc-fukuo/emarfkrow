@@ -65,75 +65,8 @@ public final class DataSources {
     /** DataSources.properties */
     private static final ResourceBundle BUNDLE = ResourceBundles.getBundle(DataSources.class);
 
-    /** 参照列名ペア */
-    private static Set<String[]> referPairs = new LinkedHashSet<String[]>();
-
-    /** 長兄 */
-    private static String nonReferRe = "";
-
-    /** 評価対象としないテーブル名の正規表現 */
-    private static String ignoreRe;
-
-    /** 兄弟判定で、長兄とするテーブル名の正規表現 */
-    private static String eldestRe = "";
-
-    /** 繰上りの弟モデルのテーブル名 */
-    private static String fosterRe = "";
-
-    /** 弟を設定しないテーブル名 */
-    private static String youngestRe = "";
-
-    /** 子を設定しないテーブル名 */
-    private static String dinksRe = "";
-
-    /** 親を設定しないテーブル名 */
-    private static String orphansRe = "";
-
-    /** 列評価をスキップする列名 */
-    private static String columnIgnoreRe = "";
-
-    /** ステータス区分 */
-    private static String status = "";
-
-    /** 変更理由 */
-    private static String reason;
-
-    /** VIEWで変換先を指定する列名 */
-    private static String viewDetailColumn = "";
-
-    /** ガントチャート化を判定する項目名のカラムサフィックス */
-    private static Set<String[]> ganttColumns = new LinkedHashSet<String[]>();
-
-    /** グラフ化を判定する項目名のカラムサフィックス */
-    private static Set<String[]> graphColumns = new LinkedHashSet<String[]>();
-
-    /** 数値列で自動採番しないサフィックス */
-    private static String noNumberingIntRe = "";
-
-    /** 固定長列で自動採番のサフィックス */
-    private static String numberingCharRe = "";
-
     /** DataSourceのJNDI名 */
     private static final String JNDI_NAME = "JNDIName";
-
-    /** タイムスタンプサフィックス */
-    private static String[] inputTimestampSuffixs;
-
-    /** 日時入力サフィックス */
-    private static String[] inputDateTimeSuffixs;
-
-    /** 日付入力サフィックス */
-    private static String[] inputDateSuffixs;
-
-    /** 時刻入力サフィックス */
-    private static String[] inputHourSuffixs;
-    //    /** 時間入力サフィックス */
-    //    private static String[] inputTimeSuffixs;
-    /** 適用日 */
-    private static String tekiyoBi;
-
-    /** 範囲指定サフィックス */
-    private static String[] inputRangeSuffixs;
 
     /**
      * データベース名列挙子
@@ -259,80 +192,10 @@ public final class DataSources {
     }
 
     /**
-     * プロパティファイルロード
-     */
-    private static void loadBundle() {
-
-        ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
-
-        if (bundle != null) {
-
-            String[] pairs = bundle.getString("relation.refer.pairs").split(",");
-            for (String pair : pairs) {
-                String[] kv = pair.split(":");
-                referPairs.add(kv);
-            }
-
-            nonReferRe = bundle.getString("relation.nonrefer.re");
-
-            ignoreRe = bundle.getString("relation.ignore.re");
-
-            eldestRe = bundle.getString("relation.eldest.re");
-
-            fosterRe = bundle.getString("relation.foster.re");
-
-            youngestRe = bundle.getString("relation.youngest.re");
-
-            dinksRe = bundle.getString("relation.dinks.re");
-
-            orphansRe = bundle.getString("relation.orphans.re");
-
-            columnIgnoreRe = bundle.getString("column.ignore.re");
-
-            status = bundle.getString("column.status");
-
-            reason = bundle.getString("column.reason");
-
-            viewDetailColumn = bundle.getString("view.detail");
-
-            String[] ganttDefs = bundle.getString("gantt.columns").split(",");
-            for (String ganttDef : ganttDefs) {
-                String[] columns = ganttDef.split(":");
-                ganttColumns.add(columns);
-            }
-
-            String[] graphDefs = bundle.getString("graph.columns").split(",");
-            for (String graphDef : graphDefs) {
-                String[] columns = graphDef.split(":");
-                graphColumns.add(columns);
-            }
-
-            noNumberingIntRe = bundle.getString("column.int.nonumbering.re");
-
-            numberingCharRe = bundle.getString("column.char.numbering.re");
-
-            inputTimestampSuffixs = bundle.getString("input.timestamp.suffixs").split(",");
-
-            inputDateTimeSuffixs = bundle.getString("input.datetime.suffixs").split(",");
-
-            inputDateSuffixs = bundle.getString("input.date.suffixs").split(",");
-
-            inputHourSuffixs = bundle.getString("input.hour.suffixs").split(",");
-
-            //        inputTimeSuffixs = bundle.getString("input.time.suffixs").split(",");
-
-            inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
-
-            tekiyoBi = bundle.getString("column.start").toUpperCase();
-        }
-    }
-
-    /**
      * スキーマのメタ情報取得
      * @return List<TableInfo>
      */
     public static List<TableInfo> getTables() {
-        loadBundle(); // 設定ファイル読み込み
         List<TableInfo> tables = new ArrayList<TableInfo>(); // テーブル情報の取得
         try { // コネクションからデータベースのメタ情報を取得
             Connection cn = Connections.get();
@@ -358,10 +221,10 @@ public final class DataSources {
                     if (!columnName.matches("^[\\#\\$\\-0-9A-Z\\_a-z]+$")) {
                         continue; // カラム名が合致しなければスキップ
                     }
-                    if (columnName.matches(columnIgnoreRe)) {
+                    if (columnName.matches(BeanGenerator.COL_IGNORE_RE)) {
                         continue;
                     }
-                    if (columnName.toUpperCase().equals(viewDetailColumn.toUpperCase())) {
+                    if (columnName.toUpperCase().equals(BeanGenerator.VIEW_DETAIL.toUpperCase())) {
                         table.setConvView(true); // 変換ビューならtrue
                     }
                     ColumnInfo column = new ColumnInfo(); // カラム情報を追加
@@ -377,13 +240,13 @@ public final class DataSources {
                     //                    if (column.getColumnSize() == 0) {
                     //                        column.setColumnSize(3);
                     //                    }
-                    if (StringUtil.endsWith(inputDateSuffixs, columnName)) { // 桁制限
+                    if (StringUtil.endsWith(BeanGenerator.INPUT_BI_SUFS, columnName)) { // 桁制限
                         column.setMaxLength(10);
-                    } else if (StringUtil.endsWith(inputHourSuffixs, columnName)) {
+                    } else if (StringUtil.endsWith(BeanGenerator.INPUT_HM_SUFS, columnName)) {
                         column.setMaxLength(5);
-                    } else if (StringUtil.endsWith(inputDateTimeSuffixs, columnName)) {
+                    } else if (StringUtil.endsWith(BeanGenerator.INPUT_DT_SUFS, columnName)) {
                         column.setMaxLength(19);
-                    } else if (StringUtil.endsWith(inputTimestampSuffixs, columnName)) {
+                    } else if (StringUtil.endsWith(BeanGenerator.INPUT_TS_SUFS, columnName)) {
                         column.setMaxLength(23);
                     }
                     column.setDecimalDigits(columns.getInt("DECIMAL_DIGITS")); // 小数桁数
@@ -460,7 +323,8 @@ public final class DataSources {
                 Iterator<TableInfo> sakis = tables.iterator();
                 while (sakis.hasNext()) {
                     TableInfo saki = sakis.next();
-                    if (!saki.isStatusFlow() && !saki.isHistory() && saki.getColumns().containsKey(status)) {
+                    if (!saki.isStatusFlow() && !saki.isHistory()
+                            && saki.getColumns().containsKey(BeanGenerator.STATUS_KB)) {
                         saki.setStatusFlow(moto);
                     }
                 }
@@ -488,7 +352,7 @@ public final class DataSources {
                 continue;
             }
             if (table.getPrimaryKeys().size() == 1) {
-                for (String[] ganttColumn : ganttColumns) {
+                for (String[] ganttColumn : BeanGenerator.GANTT_COLS) {
                     boolean nameColumn = false;
                     boolean startColumn = false;
                     boolean endColumn = false;
@@ -519,7 +383,7 @@ public final class DataSources {
                 continue;
             }
             boolean isGraph = false;
-            for (String[] graphColumn : graphColumns) {
+            for (String[] graphColumn : BeanGenerator.GRAPH_COLS) {
                 for (String columnName : graphColumn) {
                     if (table.getColumns().containsKey(columnName)) {
                         isGraph = true;
@@ -533,7 +397,7 @@ public final class DataSources {
             // グラフなら範囲指定カラムのみ必須にする（検索条件制御のため）
             if (isGraph) {
                 for (ColumnInfo column : table.getColumns().values()) {
-                    if (StringUtil.endsWith(inputRangeSuffixs, column.getName())) {
+                    if (StringUtil.endsWith(BeanGenerator.INPUT_RG_SUFS, column.getName())) {
                         column.setNullable(0);
                     } else {
                         column.setNullable(1);
@@ -570,7 +434,7 @@ public final class DataSources {
             }
 
             //対象外のテーブル名ならスキップ
-            if (!StringUtil.isNullOrWhiteSpace(ignoreRe) && tableName.matches(ignoreRe)) {
+            if (!StringUtil.isNullOrWhiteSpace(BeanGenerator.IGNORE_RE) && tableName.matches(BeanGenerator.IGNORE_RE)) {
                 continue;
             }
 
@@ -596,7 +460,8 @@ public final class DataSources {
             String tableType = rs.getString("TABLE_TYPE");
             table.setView(tableType.equals("VIEW"));
 
-            table.setStatusFlow(!status.equals("") && tableName.matches("(?i).*" + status + ".*"));
+            table.setStatusFlow(!StringUtil.isNullOrWhiteSpace(BeanGenerator.STATUS_KB)
+                    && tableName.matches("(?i).*" + BeanGenerator.STATUS_KB + ".*"));
 
             tree.put(tableName, table);
 
@@ -636,7 +501,7 @@ public final class DataSources {
                     continue;
                 }
 
-                if (columnName.matches(columnIgnoreRe)) {
+                if (columnName.matches(BeanGenerator.COL_IGNORE_RE)) {
                     continue;
                 }
 
@@ -720,7 +585,7 @@ public final class DataSources {
             dataType = "Integer";
 
             if (column.isPk()) {
-                if (!column.getName().matches(noNumberingIntRe)) {
+                if (!column.getName().matches(BeanGenerator.INT_NONUMBERING_RE)) {
                     column.setNumbering(true);
                 }
             }
@@ -731,16 +596,16 @@ public final class DataSources {
             dataType = "java.math.BigDecimal";
 
             if (column.isPk() && column.getDecimalDigits() == 0) {
-                if (!column.getName().matches(noNumberingIntRe)) {
+                if (!column.getName().matches(BeanGenerator.INT_NONUMBERING_RE)) {
                     column.setNumbering(true);
                 }
             }
 
-        } else if (StringUtil.endsWith(inputDateSuffixs, column.getName())) {
+        } else if (StringUtil.endsWith(BeanGenerator.INPUT_BI_SUFS, column.getName())) {
 
             dataType = "java.time.LocalDate";
 
-        } else if (StringUtil.endsWith(inputHourSuffixs, column.getName())) {
+        } else if (StringUtil.endsWith(BeanGenerator.INPUT_HM_SUFS, column.getName())) {
 
             dataType = "java.time.LocalTime";
 
@@ -755,7 +620,7 @@ public final class DataSources {
 
             if (typeName.equals("CHAR")) {
                 if (column.isPk()) {
-                    if (column.getName().matches(numberingCharRe)) {
+                    if (column.getName().matches(BeanGenerator.CHAR_NUMBERING_RE)) {
                         column.setNumbering(true);
                     }
                 }
@@ -781,7 +646,10 @@ public final class DataSources {
 
             // 適用日を除く、主キーがなければスキップ
             List<String> sakiKeys = new ArrayList<String>(saki.getPrimaryKeys());
-            sakiKeys.remove(tekiyoBi);
+            if (BeanGenerator.TEKIYO_BI != null) {
+                sakiKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                sakiKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
+            }
             if (sakiKeys.size() == 0) {
                 continue;
             }
@@ -806,7 +674,7 @@ public final class DataSources {
             //            }
 
             // 参照先としないテーブル
-            if (saki.getName().matches(nonReferRe)) {
+            if (saki.getName().matches(BeanGenerator.NON_REFER_RE)) {
                 continue;
             }
 
@@ -825,7 +693,8 @@ public final class DataSources {
 
                 // 適用日が主キーに含まれる場合は除去
                 List<String> motoKeys = new ArrayList<String>(moto.getPrimaryKeys());
-                motoKeys.remove(tekiyoBi);
+                motoKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                motoKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
 
                 // 参照元トランのカラム情報でループ（比較元のユニークキーがあれば参照テーブルリストに追加）
                 for (Entry<String, ColumnInfo> e : moto.getColumns().entrySet()) {
@@ -917,7 +786,7 @@ public final class DataSources {
 
         List<String> mstKeys = table.getPrimaryKeys();
 
-        for (String[] referPair : referPairs) {
+        for (String[] referPair : BeanGenerator.REFER_PAIRS) {
             String[] keySufs = referPair[0].split("&");
 
             // マスタキーが一つでも合致しなければ次の参照ペアに移動
@@ -1004,8 +873,9 @@ public final class DataSources {
 
             // 適用日はスキップ
             List<String> primaryKeys = new ArrayList<String>(saki.getPrimaryKeys());
-            if (primaryKeys.get(primaryKeys.size() - 1).equals(tekiyoBi)) {
-                primaryKeys.remove(tekiyoBi);
+            if (primaryKeys.get(primaryKeys.size() - 1).toLowerCase().equals(BeanGenerator.TEKIYO_BI.toLowerCase())) {
+                primaryKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                primaryKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
             }
 
             // 主キーに参照キー以外が含まれるならスキップ
@@ -1049,17 +919,21 @@ public final class DataSources {
             }
 
             // 里子モデルならスキップ
-            if (eld.getName().matches(fosterRe)) {
+            if (eld.getName().matches(BeanGenerator.FOSTER_RE)) {
                 continue;
             }
 
             // 末弟モデルならスキップ
-            if (eld.getName().matches(youngestRe)) {
+            if (eld.getName().matches(BeanGenerator.YOUNGEST_RE)) {
                 continue;
             }
 
             // 比較元の主キーに適用日が含まれているか（比較先ごとに行う）
-            boolean isTekiyoBiEld = eld.getPrimaryKeys().contains(tekiyoBi);
+            boolean isTekiyoBiEld = false;
+            if (BeanGenerator.TEKIYO_BI != null) {
+                isTekiyoBiEld = eld.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toLowerCase())
+                        || eld.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toUpperCase());
+            }
 
             // 比較先としてループ
             Iterator<TableInfo> yngs = tables.iterator();
@@ -1081,12 +955,12 @@ public final class DataSources {
                 }
 
                 // 里子モデルならスキップ
-                if (yng.getName().matches(fosterRe)) {
+                if (yng.getName().matches(BeanGenerator.FOSTER_RE)) {
                     continue;
                 }
 
                 // 長兄モデルならスキップ
-                if (yng.getName().matches(eldestRe)) {
+                if (yng.getName().matches(BeanGenerator.ELDEST_RE)) {
                     continue;
                 }
 
@@ -1098,10 +972,16 @@ public final class DataSources {
                 // 兄弟ともに適用日が主キーに含まれる場合は評価から除外
                 List<String> eldKeys = new ArrayList<String>(eld.getPrimaryKeys());
                 List<String> yngKeys = new ArrayList<String>(yng.getPrimaryKeys());
-                boolean isTekiyoBiYng = yngKeys.contains(tekiyoBi);
+                boolean isTekiyoBiYng = false;
+                if (BeanGenerator.TEKIYO_BI != null) {
+                    isTekiyoBiYng = yngKeys.contains(BeanGenerator.TEKIYO_BI.toLowerCase())
+                            || yngKeys.contains(BeanGenerator.TEKIYO_BI.toUpperCase());
+                }
                 if (isTekiyoBiEld && isTekiyoBiYng) {
-                    eldKeys.remove(tekiyoBi);
-                    yngKeys.remove(tekiyoBi);
+                    eldKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                    eldKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
+                    yngKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                    yngKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
                 }
 
                 // 主キーが合致しなければスキップ
@@ -1166,8 +1046,9 @@ public final class DataSources {
 
                 // 変更理由列は比較対象から除外
                 List<String> sakiNonPrimaryKeys = new IgnoreCaseList<String>(saki.getNonPrimaryKeys());
-                if (!StringUtil.isNullOrWhiteSpace(reason) && sakiNonPrimaryKeys.contains(reason)) {
-                    sakiNonPrimaryKeys.remove(reason);
+                if (!StringUtil.isNullOrWhiteSpace(BeanGenerator.REASON)
+                        && sakiNonPrimaryKeys.contains(BeanGenerator.REASON)) {
+                    sakiNonPrimaryKeys.remove(BeanGenerator.REASON);
                 }
 
                 String sakiKeyCsv = saki.getPrimaryKeys().toString().replaceAll("[\\[\\]]", "");
@@ -1221,7 +1102,7 @@ public final class DataSources {
             }
 
             // 子を設定しないならスキップ
-            if (oya.getName().matches(dinksRe)) {
+            if (oya.getName().matches(BeanGenerator.DINKS_RE)) {
                 continue;
             }
 
@@ -1231,7 +1112,11 @@ public final class DataSources {
             }
 
             // 主キーに適用日があるか
-            boolean isOyaTekiyoBi = oya.getPrimaryKeys().contains(tekiyoBi);
+            boolean isOyaTekiyoBi = false;
+            if (BeanGenerator.TEKIYO_BI != null) {
+                isOyaTekiyoBi = oya.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toLowerCase())
+                        || oya.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toUpperCase());
+            }
 
             // テーブル情報でループ（比較先）
             Iterator<TableInfo> kos = tables.iterator();
@@ -1248,7 +1133,7 @@ public final class DataSources {
                 }
 
                 // 親を設定しないならスキップ
-                if (ko.getName().matches(orphansRe)) {
+                if (ko.getName().matches(BeanGenerator.ORPHANS_RE)) {
                     continue;
                 }
 
@@ -1274,18 +1159,25 @@ public final class DataSources {
                     continue;
                 }
 
-                boolean isKoTekiyoBi = ko.getPrimaryKeys().contains(tekiyoBi);
+                boolean isKoTekiyoBi = false;
+                if (BeanGenerator.TEKIYO_BI != null) {
+                    isKoTekiyoBi = ko.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toLowerCase())
+                            || ko.getPrimaryKeys().contains(BeanGenerator.TEKIYO_BI.toUpperCase());
+                }
 
                 // 親にも主キーに適用日があれば、評価から除外
                 List<String> oyaKeys = new ArrayList<String>(oya.getPrimaryKeys());
                 List<String> koKeys = new ArrayList<String>(ko.getPrimaryKeys());
                 if (isOyaTekiyoBi && isKoTekiyoBi) {
-                    oyaKeys.remove(tekiyoBi);
-                    koKeys.remove(tekiyoBi);
+                    oyaKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                    oyaKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
+                    koKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                    koKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
                 }
                 // 親には適用日がないが子から適用日を外すと親子かもしれない場合
                 if (!isOyaTekiyoBi && isKoTekiyoBi && oyaKeys.size() + 2 == koKeys.size()) {
-                    koKeys.remove(tekiyoBi);
+                    koKeys.remove(BeanGenerator.TEKIYO_BI.toLowerCase());
+                    koKeys.remove(BeanGenerator.TEKIYO_BI.toUpperCase());
                 }
 
                 // 適用日を処置した結果、主キーがなければスキップ

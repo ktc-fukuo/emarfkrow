@@ -130,7 +130,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
                     if (BeanGenerator.isMetaBy(column.getName())) {
                         continue; // メタ情報ならスキップ
                     }
-                    if (StringUtil.endsWith(FILE_SUFS, column.getName())) { //ファイル列があれば新規行なし
+                    if (StringUtil.endsWith(INPUT_FILE_SUFS, column.getName())) { //ファイル列があれば新規行なし
                         isNotAddRow = true;
                         break;
                     }
@@ -202,7 +202,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
      */
     public static void addKessaiButtons(final TableInfo table, final String e, final List<String> s) {
         //ステータス列名の指定があり、テーブルにステータス列があるなら、承認ボタン・否認ボタンを表示
-        if (table.getColumns().containsKey(STATUS)) {
+        if (table.getColumns().containsKey(STATUS_KB)) {
             String onClick = "";
             if (table.getStatusFlow() != null && !StringUtil.isNullOrWhiteSpace(REASON)) {
                 onClick = " onclick=\"if (!Base.kessaiTx(this)) { return false; }\"";
@@ -290,7 +290,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         if (table.getName().matches(ELDEST_RE)) {
             for (TableInfo bro : table.getBrothers()) {
                 for (String colName : bro.getNonPrimaryKeys()) {
-                    if (colName.matches("(?i)^" + UPDATE_TS + "$")) {
+                    if (colName.matches("(?i)^" + UPDATE_AT + "$")) {
                         continue;
                     }
                     ColumnInfo column = bro.getColumns().get(colName);
@@ -324,7 +324,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         String e = StringUtil.toPascalCase(table.getName());
         String n = column.getName();
         String m = "Messages['" + e + "Grid." + StringUtil.toCamelCase(n) + "']";
-        boolean isUpdTs = n.matches("(?i)^" + UPDATE_TS + "$");
+        boolean isUpdTs = n.matches("(?i)^" + UPDATE_AT + "$");
         if (!isUpdTs && BeanGenerator.isMetaTsBy(n)) {
             return null;
         }
@@ -334,7 +334,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         String format = "null";
         if (column.getDataType().equals("java.time.LocalDate")) {
             format = "Slick.Formatters.Extends.Date";
-        } else if (StringUtil.endsWith(TS_SUFS, n)) {
+        } else if (StringUtil.endsWith(INPUT_TS_SUFS, n)) {
             format = "Slick.Formatters.Extends.Timestamp";
         } else if (column.getDataType().equals("java.time.LocalDateTime")) {
             format = "Slick.Formatters.Extends.DateTime";
@@ -412,40 +412,40 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
             }
         }
         if (isMeiRefer) {
-            if (!type.matches(NUM_RE) || StringUtil.endsWith(INT_NOFORMAT_SUFFIXS, n)) {
+            if (!type.matches(NUM_RE) || StringUtil.endsWith(INT_NOFORMAT_SUFS, n)) {
                 return "Column.refer('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', '" + rMei + "'),";
             } else {
                 return getNumericRefer(column, prefix + cId, m, w, css, rMei);
             }
         } else if (BeanGenerator.isMetaTsBy(n) || column.isReborn()) {
             return "Column.cell('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(INPUT_FLAG_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_F_SUFS, n)) {
             return "Column.check('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "'),";
-        } else if (StringUtil.endsWith(INPUT_BIT_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_B_SUFS, n)) {
             return "Column.bit('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "'),";
-        } else if (StringUtil.endsWith(INPUT_DATE_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_BI_SUFS, n)) {
             return "Column.date('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(INPUT_DATE8_SUFFIXS, n) && column.getColumnSize() == 8) {
+        } else if (StringUtil.endsWith(INPUT_D8_SUFS, n) && column.getColumnSize() == 8) {
             return "Column.date8('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(TS_SUFS, n)) {
+        } else if (StringUtil.endsWith(INPUT_TS_SUFS, n)) {
             return "Column.cell('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(INPUT_DATETIME_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_DT_SUFS, n)) {
             return "Column.dateTime('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "'),";
-        } else if (StringUtil.endsWith(INPUT_YM_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_YM_SUFS, n)) {
             return "Column.month('" + prefix + cId + "', " + m + ", " + w + ", '" + css
                     + "', Slick.Formatters.Extends.Month),";
-        } else if (StringUtil.endsWith(INPUT_HOUR_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_HM_SUFS, n)) {
             return "Column.hour('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(INPUT_TIME_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_TM_SUFS, n)) {
             return "Column.time('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (StringUtil.endsWith(FILE_SUFS, n)) {
+        } else if (StringUtil.endsWith(INPUT_FILE_SUFS, n)) {
             return "Column.link('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "'),";
-        } else if (StringUtil.endsWith(OPTIONS_SUFFIXS, n)) {
-            return "Column.select('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', { json: '" + JSON
+        } else if (StringUtil.endsWith(INPUT_OP_SUFS, n)) {
+            return "Column.select('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', { json: '" + OPT_J
                     + "', paramkey: '" + OPT_K + "', value: '" + OPT_V + "', label: '" + OPT_L + "' }),";
-        } else if (StringUtil.endsWith(TEXTAREA_SUFFIXS, n)) {
+        } else if (StringUtil.endsWith(INPUT_TX_SUFFIXS, n)) {
             return "Column.longText('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
-        } else if (type.matches(NUM_RE) && !StringUtil.endsWith(INT_NOFORMAT_SUFFIXS, n)) {
+        } else if (type.matches(NUM_RE) && !StringUtil.endsWith(INT_NOFORMAT_SUFS, n)) {
             // TODO postgresで確認
             return getNumericColumn(column, prefix + cId, m, w, css, format);
         } else {
@@ -496,7 +496,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
                     cs = "notblank";
                 }
             }
-            if (StringUtil.endsWith(INPUT_READONLY_SUFFIXS, n)) {
+            if (StringUtil.endsWith(INPUT_RO_SUFS, n)) {
                 cs += " readonly";
             }
         }

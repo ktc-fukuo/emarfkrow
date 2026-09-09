@@ -22,77 +22,33 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import jp.co.golorp.emarf.io.FileUtil;
 import jp.co.golorp.emarf.lang.StringUtil;
-import jp.co.golorp.emarf.properties.App;
-import jp.co.golorp.emarf.util.ResourceBundles;
 
 /**
  * 詳細画面アクション出力
  */
-public final class DetailActionGenerator {
-
-    /** 起動時の自動生成か */
-    private static boolean isGenerateAtStartup;
-
-    /** プロジェクトディレクトリ */
-    private static String projectDir;
-
-    /** BeanGenerator.properties */
-    private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
-    /** 適用日カラム名 */
-    private static String tekiyoBi;
-    /** 削除フラグ */
-    private static String deleteF;
-    /** ステータス区分 */
-    private static String status;
-
-    /** javaファイル出力ルートパス */
-    private static String javaDir = "src\\main\\java";
-
-    /** actionパッケージ */
-    private static String pkgA = "com.example.action.model.base";
-    /** entityパッケージ */
-    private static String pkE = "com.example.entity";
+public final class ActionGeneratorDetail extends BeanGenerator {
 
     /** プライベートコンストラクタ */
-    private DetailActionGenerator() {
+    private ActionGeneratorDetail() {
     }
 
     /**
      * 各ファイル出力 主処理
-     * @param dir プロジェクトのディレクトリ
      * @param tables
      */
-    public static void generate(final String dir, final List<TableInfo> tables) {
-
-        //webからの自動生成ならコンパイルまで行う
-        if (App.get("generateAtStartup") != null) {
-            isGenerateAtStartup = App.get("generateAtStartup").toLowerCase().equals("true");
-        }
-
-        //プロジェクトディレクトリを退避
-        projectDir = dir;
-
-        if (bundle != null) {
-
-            tekiyoBi = bundle.getString("column.start");
-            deleteF = bundle.getString("column.delete");
-            status = bundle.getString("column.status");
-
-            javaDir = bundle.getString("dir.java");
-
-            pkgA = bundle.getString("java.package.action") + ".model.base";
-            pkE = bundle.getString("java.package.entity");
-        }
+    public static void generate(final List<TableInfo> tables) {
 
         javaActionDetailRegist(tables);
+
         javaActionDetailGet(tables);
+
         javaActionDetailDelete(tables);
-        if (!StringUtil.isNullOrWhiteSpace(status)) {
+
+        if (!StringUtil.isNullOrWhiteSpace(STATUS_KB)) {
             javaActionDetailApply(tables);
             javaActionDetailCancel(tables);
             javaActionDetailPermit(tables);
@@ -106,8 +62,8 @@ public final class DetailActionGenerator {
      */
     private static void javaActionDetailRegist(final List<TableInfo> tables) {
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tables) {
             if (table.isHistory() || table.isView() || table.isStatusFlow()) {
@@ -119,13 +75,13 @@ public final class DetailActionGenerator {
             String entity = StringUtil.toPascalCase(table.getName());
             String r = table.getRemarks();
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + entity + ";");
+            s.add("import " + PKG_E + "." + entity + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -174,9 +130,9 @@ public final class DetailActionGenerator {
                     s.add("            if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(" + sKey + ")) {");
                     s.add("                String[] summaryKeys = " + sKey + ".trim().split(\",\");");
                     s.add("                for (String pk : summaryKeys) {");
-                    s.add("                    " + pkE + "." + e + " " + i + " = " + pkE + "." + e + ".get(pk);");
-                    if (!StringUtil.isNullOrWhiteSpace(status) && summaryOf.getColumns().containsKey(status)) {
-                        String acc = StringUtil.toPascalCase(status);
+                    s.add("                    " + PKG_E + "." + e + " " + i + " = " + PKG_E + "." + e + ".get(pk);");
+                    if (!StringUtil.isNullOrWhiteSpace(STATUS_KB) && summaryOf.getColumns().containsKey(STATUS_KB)) {
+                        String acc = StringUtil.toPascalCase(STATUS_KB);
                         s.add("                    //承認済みでなければエラー");
                         s.add("                    if (!" + i + ".get" + acc + "().equals(\"1\")) {");
                         s.add("                        throw new OptLockError(\"error.nopermit.summary\", \""
@@ -221,12 +177,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "RegistAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + entity + "RegistAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "RegistAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -239,8 +195,8 @@ public final class DetailActionGenerator {
      */
     private static void javaActionDetailGet(final List<TableInfo> tables) {
         // 出力フォルダを再作成
-        String pPath = pkgA.replace(".", File.separator);
-        String pDir = projectDir + File.separator + javaDir + File.separator + pPath;
+        String pPath = PKG_A.replace(".", File.separator);
+        String pDir = getProjectDir() + File.separator + DIR_J + File.separator + pPath;
         Map<String, String> javaPaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tables) {
             if (table.getPrimaryKeys().size() == 0) {
@@ -251,13 +207,13 @@ public final class DetailActionGenerator {
             //instance
             String ins = StringUtil.toCamelCase(table.getName());
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + ent + ";");
+            s.add("import " + PKG_E + "." + ent + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.NoDataError;");
@@ -312,7 +268,7 @@ public final class DetailActionGenerator {
                     for (TableInfo parent : table.getParents()) {
                         List<String> oyaKeys = new ArrayList<String>(parent.getPrimaryKeys());
                         String oyaPKs = oyaKeys.toString().replaceAll("[\\[\\]]", "");
-                        oyaKeys.remove(tekiyoBi);
+                        oyaKeys.remove(TEKIYO_BI);
                         String oyaKeyCsv = oyaKeys.toString().replaceAll("[\\[\\]]", "");
                         if (!pks.equals(oyaKeyCsv)) {
                             continue;
@@ -321,7 +277,7 @@ public final class DetailActionGenerator {
                         String pI = StringUtil.toCamelCase(parent.getName());
                         String oyaKey = StringUtil.toCamelCase(oyaPKs);
                         s.add("        try {"); // 片親の場合もあるので親なしでもエラーにしない
-                        s.add("            " + pkE + "." + pE + " " + pI + " = " + pkE + "." + pE + ".get(" + oyaKey
+                        s.add("            " + PKG_E + "." + pE + " " + pI + " = " + PKG_E + "." + pE + ".get(" + oyaKey
                                 + ");");
                         s.add("            map.put(\"" + pE + "\", " + pI + ");");
                         s.add("        } catch (Exception e) {");
@@ -376,12 +332,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = pDir + File.separator + ent + "GetAction.java";
-            javaPaths.put(javaFilePath, pkgA + "." + ent + "GetAction");
+            javaPaths.put(javaFilePath, PKG_A + "." + ent + "GetAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaPaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -395,8 +351,8 @@ public final class DetailActionGenerator {
     private static void javaActionDetailDelete(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
@@ -411,20 +367,20 @@ public final class DetailActionGenerator {
             }
 
             // 論理削除テーブルならスキップ（削除フラグ指定があり、テーブルに削除フラグがある場合）
-            if (!StringUtil.isNullOrWhiteSpace(deleteF) && table.getColumns().containsKey(deleteF)) {
+            if (!StringUtil.isNullOrWhiteSpace(DELETE_F) && table.getColumns().containsKey(DELETE_F)) {
                 continue;
             }
 
             String e = StringUtil.toPascalCase(table.getName());
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + e + ";");
+            s.add("import " + PKG_E + "." + e + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -477,12 +433,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "DeleteAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + e + "DeleteAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "DeleteAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -496,15 +452,15 @@ public final class DetailActionGenerator {
     private static void javaActionDetailApply(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
         for (TableInfo table : tables) {
 
             if (table.isHistory() || table.isView() || table.isStatusFlow()
-                    || !table.getColumns().containsKey(status)) {
+                    || !table.getColumns().containsKey(STATUS_KB)) {
                 continue;
             }
 
@@ -512,13 +468,13 @@ public final class DetailActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + entity + ";");
+            s.add("import " + PKG_E + "." + entity + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -559,9 +515,9 @@ public final class DetailActionGenerator {
             BeanGenerator.getApplyChilds(s, "e", childInfos, 0);
             s.add("");
             //s.add("        " + entity + " f = " + entity + ".get(" + params + ");");
-            if (table.getColumns().containsKey(status)) {
-                String acc = StringUtil.toPascalCase(status);
-                String fld = StringUtil.toCamelCase(status);
+            if (table.getColumns().containsKey(STATUS_KB)) {
+                String acc = StringUtil.toPascalCase(STATUS_KB);
+                String fld = StringUtil.toCamelCase(STATUS_KB);
                 s.add("        if (e.get" + acc + "() != null && !e.get" + acc + "().equals(\"\")) {");
                 s.add("            throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                    Messages.get(\"" + entity + "." + fld
@@ -581,12 +537,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "ApplyAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + entity + "ApplyAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "ApplyAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -600,15 +556,15 @@ public final class DetailActionGenerator {
     private static void javaActionDetailCancel(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
         for (TableInfo table : tables) {
 
             if (table.isHistory() || table.isView() || table.isStatusFlow()
-                    || !table.getColumns().containsKey(status)) {
+                    || !table.getColumns().containsKey(STATUS_KB)) {
                 continue;
             }
 
@@ -616,13 +572,13 @@ public final class DetailActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + entity + ";");
+            s.add("import " + PKG_E + "." + entity + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -663,9 +619,9 @@ public final class DetailActionGenerator {
             BeanGenerator.getCancelChilds(s, "e", childInfos, 0);
             s.add("");
             //s.add("        " + entity + " f = " + entity + ".get(" + params + ");");
-            if (table.getColumns().containsKey(status)) {
-                String acc = StringUtil.toPascalCase(status);
-                String fld = StringUtil.toCamelCase(status);
+            if (table.getColumns().containsKey(STATUS_KB)) {
+                String acc = StringUtil.toPascalCase(STATUS_KB);
+                String fld = StringUtil.toCamelCase(STATUS_KB);
                 s.add("        if (!e.get" + acc + "().equals(\"0\") && !e.get" + acc + "().equals(\"-1\")) {");
                 s.add("            throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                    Messages.get(\"" + entity + "." + fld
@@ -685,12 +641,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "CancelAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + entity + "CancelAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "CancelAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -704,15 +660,15 @@ public final class DetailActionGenerator {
     private static void javaActionDetailPermit(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
         for (TableInfo table : tables) {
 
             if (table.isHistory() || table.isView() || table.isStatusFlow()
-                    || !table.getColumns().containsKey(status)) {
+                    || !table.getColumns().containsKey(STATUS_KB)) {
                 continue;
             }
 
@@ -720,13 +676,13 @@ public final class DetailActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + entity + ";");
+            s.add("import " + PKG_E + "." + entity + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -767,9 +723,9 @@ public final class DetailActionGenerator {
             BeanGenerator.getPermitChilds(s, "e", childInfos, 0);
             s.add("");
             //s.add("        " + entity + " f = " + entity + ".get(" + params + ");");
-            if (table.getColumns().containsKey(status)) {
-                String acc = StringUtil.toPascalCase(status);
-                String fld = StringUtil.toCamelCase(status);
+            if (table.getColumns().containsKey(STATUS_KB)) {
+                String acc = StringUtil.toPascalCase(STATUS_KB);
+                String fld = StringUtil.toCamelCase(STATUS_KB);
                 s.add("        if (e.get" + acc + "() != null && !e.get" + acc + "().equals(\"0\")) {");
                 s.add("            throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                    Messages.get(\"" + entity + "." + fld
@@ -789,12 +745,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "PermitAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + entity + "PermitAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "PermitAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -808,15 +764,15 @@ public final class DetailActionGenerator {
     private static void javaActionDetailForbid(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = pkgA.replace(".", File.separator);
-        String packageDir = projectDir + File.separator + javaDir + File.separator + packagePath;
+        String packagePath = PKG_A.replace(".", File.separator);
+        String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
 
         for (TableInfo table : tables) {
 
             if (table.isHistory() || table.isView() || table.isStatusFlow()
-                    || !table.getColumns().containsKey(status)) {
+                    || !table.getColumns().containsKey(STATUS_KB)) {
                 continue;
             }
 
@@ -824,13 +780,13 @@ public final class DetailActionGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + pkgA + ";");
+            s.add("package " + PKG_A + ";");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
             s.add("import java.util.Map;");
             s.add("");
-            s.add("import " + pkE + "." + entity + ";");
+            s.add("import " + PKG_E + "." + entity + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.action.BaseAction;");
             s.add("import jp.co.golorp.emarf.exception.OptLockError;");
@@ -871,9 +827,9 @@ public final class DetailActionGenerator {
             BeanGenerator.getForbidChilds(s, "e", childInfos, 0);
             s.add("");
             //s.add("        " + entity + " f = " + entity + ".get(" + params + ");");
-            if (table.getColumns().containsKey(status)) {
-                String acc = StringUtil.toPascalCase(status);
-                String fld = StringUtil.toCamelCase(status);
+            if (table.getColumns().containsKey(STATUS_KB)) {
+                String acc = StringUtil.toPascalCase(STATUS_KB);
+                String fld = StringUtil.toCamelCase(STATUS_KB);
                 s.add("        if (!e.get" + acc + "().equals(\"0\") && !e.get" + acc + "().equals(\"1\")) {");
                 s.add("            throw new jp.co.golorp.emarf.exception.AppError(\"error.notmatch\",");
                 s.add("                    Messages.get(\"" + entity + "." + fld
@@ -893,12 +849,12 @@ public final class DetailActionGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "ForbidAction.java";
-            javaFilePaths.put(javaFilePath, pkgA + "." + entity + "ForbidAction");
+            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "ForbidAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
 
-        if (isGenerateAtStartup) {
+        if (IS_GENERATE_AT_STARTUP) {
             for (Entry<String, String> e : javaFilePaths.entrySet()) {
                 BeanGenerator.javaCompile(e.getKey(), e.getValue());
             }
@@ -977,7 +933,8 @@ public final class DetailActionGenerator {
             String frName = frTbl.getName();
             String frE = StringUtil.toPascalCase(frName);
             String frI = StringUtil.toCamelCase(frName);
-            s.add("                " + pkE + "." + frE + " " + frI + " = " + pkE + "." + frE + ".get(" + frK + ");");
+            s.add("                " + PKG_E + "." + frE + " " + frI + " = " + PKG_E + "." + frE + ".get(" + frK
+                    + ");");
             for (String frColNm : frTbl.getColumns().keySet()) {
                 // メタ情報ならスキップ
                 if (BeanGenerator.isMeta(frColNm)) {
@@ -1010,11 +967,11 @@ public final class DetailActionGenerator {
                     String cE = StringUtil.toPascalCase(childName);
                     String cI = StringUtil.toCamelCase(childName);
                     s.add("                " + frI + ".refer" + StringUtil.toPascalCase(frCNm) + "s();");
-                    s.add("                " + toI + ".set" + cE + "s(new java.util.ArrayList<" + pkE + "." + cE
+                    s.add("                " + toI + ".set" + cE + "s(new java.util.ArrayList<" + PKG_E + "." + cE
                             + ">());");
-                    s.add("                for (" + pkE + "." + fCE + " " + fCI + " : " + frI + ".refer" + fCE
+                    s.add("                for (" + PKG_E + "." + fCE + " " + fCI + " : " + frI + ".refer" + fCE
                             + "s()) {");
-                    s.add("                    " + pkE + "." + cE + " " + cI + " = new " + pkE + "." + cE + "();");
+                    s.add("                    " + PKG_E + "." + cE + " " + cI + " = new " + PKG_E + "." + cE + "();");
                     s.add("                    " + cI + ".setId(" + fCI + ".getId());");
                     for (String frCColNm : frChild.getColumns().keySet()) {
                         // メタ情報ならスキップ

@@ -20,11 +20,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -33,186 +31,22 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.golorp.emarf.io.FileUtil;
 import jp.co.golorp.emarf.lang.StringUtil;
-import jp.co.golorp.emarf.util.ResourceBundles;
 
 /**
  * HTMLファイル出力
  *
  * @author golorp
  */
-public abstract class HtmlGenerator {
-
-    /** 数値項目の正規表現 */
-    protected static final String NUM_RE = "INT|DECIMAL|DOUBLE|NUMBER|NUMERIC";
+public abstract class HtmlGenerator extends BeanGenerator {
 
     /** logger */
     private static final Logger LOG = LoggerFactory.getLogger(HtmlGenerator.class);
 
-    /** properties */
-    private static ResourceBundle bundle = ResourceBundles.getBundle(BeanGenerator.class);
+    /** 数値項目の正規表現 */
+    protected static final String NUM_RE = "INT|DECIMAL|DOUBLE|NUMBER|NUMERIC";
 
     /** グリッド列幅ピクセル乗数 */
     protected static final int COLUMN_WIDTH_PX_MULTIPLIER = 10;
-
-    /** 長兄 */
-    protected static final String ELDEST_RE;
-    /** 弟を設定しないテーブル名 */
-    private static String youngestRe = "";
-
-    /** 参照列名ペア */
-    protected static final Set<String[]> REFER_PAIRS = new LinkedHashSet<String[]>();
-
-    /** 適用日カラム名 */
-    protected static final String TEKIYO_BI;
-    /** 廃止日カラム名 */
-    protected static final String HAISHI_BI;
-    /** 更新日時カラム名 */
-    protected static final String UPDATE_TS;
-    /** ステータス区分 */
-    protected static final String STATUS;
-    /** 削除フラグ */
-    protected static final String DELETE_F;
-    /** 変更理由 */
-    protected static final String REASON;
-
-    /** 数値だがフォーマットしないサフィックス */
-    protected static final String[] INT_NOFORMAT_SUFFIXS;
-    /** 必須CHAR列の指定 */
-    protected static final String CHAR_NOTNULL_RE;
-
-    /** ページ行数 */
-    protected static final String GRID_ROWS;
-
-    /** VIEWの検索条件とするプレフィクス */
-    protected static final String[] VIEW_CRITERIA_PREFIXS;
-    /** VIEWの詳細画面にするテーブル名 */
-    protected static final String VIEW_DETAIL;
-    /** ガントチャート化を判定する項目名・開始日・終了日のカラムサフィックス */
-    private static Set<String[]> ganttColumns = new LinkedHashSet<String[]>();
-    /** メニュー化しない正規表現 */
-    private static String navIgnoreRe = "";
-
-    /** 読み取り専用サフィックス */
-    protected static final String[] INPUT_READONLY_SUFFIXS;
-    /** 数値入力サフィックス */
-    private static String[] inputNumberSuffixs;
-    /** 年月入力サフィックス */
-    protected static final String[] INPUT_YM_SUFFIXS;
-    /** 8桁日付入力サフィックス */
-    protected static final String[] INPUT_DATE8_SUFFIXS;
-    /** タイムスタンプサフィックス */
-    protected static final String[] TS_SUFS;
-    /** 日時入力サフィックス */
-    protected static final String[] INPUT_DATETIME_SUFFIXS;
-    /** 日付入力サフィックス */
-    protected static final String[] INPUT_DATE_SUFFIXS;
-    /** 時刻入力サフィックス */
-    protected static final String[] INPUT_HOUR_SUFFIXS;
-    /** 時間入力サフィックス */
-    protected static final String[] INPUT_TIME_SUFFIXS;
-    /** 範囲指定サフィックス */
-    private static String[] inputRangeSuffixs;
-    /** フラグサフィックス */
-    protected static final String[] INPUT_FLAG_SUFFIXS;
-    /** ビットフラグサフィックス */
-    protected static final String[] INPUT_BIT_SUFFIXS;
-    /** ファイルサフィックス */
-    protected static final String[] FILE_SUFS;
-    /** options項目サフィックス */
-    protected static final String[] OPTIONS_SUFFIXS;
-    /** pulldown項目サフィックス */
-    private static String[] pulldownSuffixs;
-    /** テキストエリア項目サフィックス */
-    protected static final String[] TEXTAREA_SUFFIXS;
-
-    /** データjson */
-    protected static final String JSON;
-    /** 区分カラム */
-    protected static final String OPT_K;
-    /** 区分値カラム */
-    protected static final String OPT_V;
-    /** 区分値名カラム */
-    protected static final String OPT_L;
-
-    /** 業務順のプレフィクス正規表現 */
-    private static Map<String, String> navOrderRes = new TreeMap<String, String>();
-
-    /***/
-    private static String dirHtml = "src\\main\\resources\\META-INF\\resources\\WEB-INF\\templates\\model";
-    /***/
-    private static String dirGrid = "src\\main\\resources\\META-INF\\resources\\model";
-
-    static {
-        if (bundle == null) {
-            ELDEST_RE = "";
-            TEKIYO_BI = "";
-            HAISHI_BI = "";
-            UPDATE_TS = "";
-            STATUS = "";
-            DELETE_F = "";
-            REASON = "";
-            INT_NOFORMAT_SUFFIXS = null;
-            CHAR_NOTNULL_RE = "";
-            GRID_ROWS = "";
-            VIEW_CRITERIA_PREFIXS = null;
-            VIEW_DETAIL = "";
-            INPUT_READONLY_SUFFIXS = null;
-            INPUT_YM_SUFFIXS = null;
-            INPUT_DATE8_SUFFIXS = null;
-            TS_SUFS = null;
-            inputNumberSuffixs = null;
-            INPUT_DATETIME_SUFFIXS = null;
-            INPUT_DATE_SUFFIXS = null;
-            INPUT_HOUR_SUFFIXS = null;
-            INPUT_TIME_SUFFIXS = null;
-            INPUT_FLAG_SUFFIXS = null;
-            INPUT_BIT_SUFFIXS = null;
-            FILE_SUFS = null;
-            OPTIONS_SUFFIXS = null;
-            TEXTAREA_SUFFIXS = null;
-            JSON = "";
-            OPT_K = "";
-            OPT_V = "";
-            OPT_L = "";
-        } else {
-            ELDEST_RE = bundle.getString("relation.eldest.re");
-            String[] pairs = bundle.getString("relation.refer.pairs").split(",");
-            for (String pair : pairs) {
-                String[] kv = pair.split(":");
-                REFER_PAIRS.add(kv);
-            }
-            TEKIYO_BI = bundle.getString("column.start");
-            HAISHI_BI = bundle.getString("column.until");
-            UPDATE_TS = bundle.getString("column.update.timestamp");
-            STATUS = bundle.getString("column.status");
-            DELETE_F = bundle.getString("column.delete");
-            REASON = bundle.getString("column.reason");
-            INT_NOFORMAT_SUFFIXS = bundle.getString("column.int.noformat.suffixs").split(",");
-            CHAR_NOTNULL_RE = bundle.getString("column.char.notnull.re");
-            GRID_ROWS = bundle.getString("grid.rows");
-            VIEW_CRITERIA_PREFIXS = bundle.getString("view.criteria.prefix").split(",");
-            VIEW_DETAIL = bundle.getString("view.detail");
-            INPUT_READONLY_SUFFIXS = bundle.getString("input.readonly.suffixs").split(",");
-            INPUT_YM_SUFFIXS = bundle.getString("input.ym.suffixs").split(",");
-            INPUT_DATE8_SUFFIXS = bundle.getString("input.date8.suffixs").split(",");
-            TS_SUFS = bundle.getString("input.timestamp.suffixs").split(",");
-            inputNumberSuffixs = bundle.getString("input.number.suffixs").split(",");
-            INPUT_DATETIME_SUFFIXS = bundle.getString("input.datetime.suffixs").split(",");
-            INPUT_DATE_SUFFIXS = bundle.getString("input.date.suffixs").split(",");
-            INPUT_HOUR_SUFFIXS = bundle.getString("input.hour.suffixs").split(",");
-            INPUT_TIME_SUFFIXS = bundle.getString("input.time.suffixs").split(",");
-            INPUT_FLAG_SUFFIXS = bundle.getString("input.flag.suffixs").split(",");
-            INPUT_BIT_SUFFIXS = bundle.getString("input.bit.suffixs").split(",");
-            FILE_SUFS = bundle.getString("input.file.suffixs").split(",");
-            OPTIONS_SUFFIXS = bundle.getString("input.options.suffixs").split(",");
-            TEXTAREA_SUFFIXS = bundle.getString("input.textarea.suffixs").split(",");
-            JSON = bundle.getString("options.json");
-            OPT_K = bundle.getString("options.key").toUpperCase();
-            OPT_V = bundle.getString("options.value").toUpperCase();
-            OPT_L = bundle.getString("options.label").toUpperCase();
-
-        }
-    }
 
     /** プライベートコンストラクタ */
     protected HtmlGenerator() {
@@ -220,44 +54,16 @@ public abstract class HtmlGenerator {
 
     /**
      * HTMLファイル出力
-     * @param projectDir プロジェクトディレクトリ
      * @param tables テーブル情報のリスト
      */
-    static void generate(final String projectDir, final List<TableInfo> tables) {
-
-        if (bundle != null) {
-
-            youngestRe = bundle.getString("relation.youngest.re");
-
-            String[] ganttDefs = bundle.getString("gantt.columns").split(",");
-            for (String ganttDef : ganttDefs) {
-                String[] columns = ganttDef.split(":");
-                ganttColumns.add(columns);
-            }
-
-            navIgnoreRe = bundle.getString("nav.ignore.re");
-
-            inputRangeSuffixs = bundle.getString("input.range.suffixs").split(",");
-            pulldownSuffixs = bundle.getString("input.pulldown.suffixs").split(",");
-
-            // 業務並び順
-            for (String key : bundle.keySet()) {
-                if (key.startsWith("nav.order.prefix.re.")) {
-                    String order = key.replaceFirst("nav.order.prefix.re.", "");
-                    String re = bundle.getString(key);
-                    navOrderRes.put(order, re);
-                }
-            }
-            dirHtml = bundle.getString("dir.html");
-            dirGrid = bundle.getString("dir.grid");
-        }
+    static void generate(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String htmlDir = projectDir + File.separator + dirHtml;
+        String htmlDir = getProjectDir() + File.separator + DIR_H;
         FileUtil.reMkDir(htmlDir);
         FileUtil.reMkDir(htmlDir + File.separator + ".." + File.separator + "common");
 
-        String gridDir = projectDir + File.separator + dirGrid;
+        String gridDir = getProjectDir() + File.separator + DIR_G;
         FileUtil.reMkDir(gridDir);
 
         for (TableInfo table : tables) {
@@ -275,7 +81,7 @@ public abstract class HtmlGenerator {
             HtmlGenerator.htmlProperties(htmlDir, table, tables);
 
             if (table.isGantt()) {
-                for (String[] ganttColumn : ganttColumns) {
+                for (String[] ganttColumn : GANTT_COLS) {
                     String nameColumn = null;
                     String startColumn = null;
                     String endColumn = null;
@@ -567,7 +373,7 @@ public abstract class HtmlGenerator {
             for (TableInfo bro : table.getBrothers()) {
                 String b = StringUtil.toPascalCase(bro.getName());
                 String className = "";
-                if (bro.getName().matches(youngestRe)) {
+                if (bro.getName().matches(YOUNGEST_RE)) {
                     className = " class=\"youngest\"";
                 }
                 s.add("      <fieldset" + className + ">");
@@ -583,7 +389,7 @@ public abstract class HtmlGenerator {
                     + c + ".add}\" class=\"addChild\" tabindex=\"-1\">" + child.getName() + "</a>");
             String addRow = " data-addRow=\"true\"";
             for (ColumnInfo column : child.getColumns().values()) {
-                if (StringUtil.endsWith(FILE_SUFS, column.getName())) {
+                if (StringUtil.endsWith(INPUT_FILE_SUFS, column.getName())) {
                     addRow = ""; // ファイル列がある場合は新規行を取消
                     break;
                 }
@@ -681,7 +487,7 @@ public abstract class HtmlGenerator {
      */
     public static void addKessaiButtons(final String e, final List<String> s, final TableInfo table) {
         //ステータス列名の指定があり、テーブルにステータス列があるなら、承認ボタン・否認ボタンを表示
-        if (table.getColumns().containsKey(STATUS)) {
+        if (table.getColumns().containsKey(STATUS_KB)) {
             String onClick = "";
             if (table.getStatusFlow() != null && !StringUtil.isNullOrWhiteSpace(REASON)) {
                 onClick = " onclick=\"if (!Base.kessaiTx(this)) { return false; }\"";
@@ -838,7 +644,7 @@ public abstract class HtmlGenerator {
             String prefix = name.replaceAll("_.+$", "");
             String navKey = prefix;
 
-            for (Entry<String, String> navOrderRe : navOrderRes.entrySet()) {
+            for (Entry<String, String> navOrderRe : NAV_ORDER_RES.entrySet()) {
                 // propertiesで指定した並び順
                 String navOrder = navOrderRe.getKey();
                 // propertiesで指定した正規表現
@@ -881,7 +687,7 @@ public abstract class HtmlGenerator {
             s.add("        <ul>");
             //            String preName = "";
             for (TableInfo table : nav.getValue()) {
-                if (table.getName().matches(navIgnoreRe) || table.getName().matches(youngestRe)) {
+                if (table.getName().matches(NAV_IGNORE_RE) || table.getName().matches(YOUNGEST_RE)) {
                     continue;
                 }
                 String name = table.getName();
@@ -1141,7 +947,7 @@ public abstract class HtmlGenerator {
             if (t.isView() && isD && StringUtil.startsWith(VIEW_CRITERIA_PREFIXS, cNm)) {
                 continue; // VIEWの詳細フォームには「SEARCH_」を出力しない
             }
-            if (!isD && (StringUtil.endsWith(FILE_SUFS, cNm) || StringUtil.endsWith(TS_SUFS, cNm))) {
+            if (!isD && (StringUtil.endsWith(INPUT_FILE_SUFS, cNm) || StringUtil.endsWith(INPUT_TS_SUFS, cNm))) {
                 continue; // 検索条件にはファイル項目とタイムスタンプを出力しない
             }
             if (!isD && t.isGraph() && c.getNullable() == 1) {
@@ -1152,7 +958,7 @@ public abstract class HtmlGenerator {
                 if (!isD) {
                     continue; // メタ情報の場合検索画面ならスキップ（検索条件にはしない）
                 } else if (isB) {
-                    if (cNm.matches("(?i)^" + UPDATE_TS + "$")) {
+                    if (cNm.matches("(?i)^" + UPDATE_AT + "$")) {
                         s.add("        <input type=\"hidden\" name=\"" + e + "." + p + "\" />");
                     }
                     continue; // 兄弟モデルならスキップ（更新日時だけは楽観ロック用に出力）
@@ -1166,7 +972,7 @@ public abstract class HtmlGenerator {
             if (BeanGenerator.isMetaTsBy(cNm)) { // メタ情報の場合は表示項目（編集画面の自モデルのみここに到達する）
                 htmlFieldsMeta(s, fId, c);
                 addMeiSpan(s, t, c, "meta");
-            } else if (StringUtil.endsWith(OPTIONS_SUFFIXS, cNm) && c.getRefer() == null) { // 参照モデルでない選択項目の場合
+            } else if (StringUtil.endsWith(INPUT_OP_SUFS, cNm) && c.getRefer() == null) { // 参照モデルでない選択項目の場合
                 String css = "";
                 if (isD && c.isPk()) { // 詳細画面の主キー
                     css += " primaryKey";
@@ -1184,13 +990,13 @@ public abstract class HtmlGenerator {
                     css += isNotBlank(c);
                 }
                 if (isD && t.getHistory() == null && !t.isHistory() && !c.isPk()
-                        && StringUtil.endsWith(INPUT_READONLY_SUFFIXS, cNm)) {
+                        && StringUtil.endsWith(INPUT_RO_SUFS, cNm)) {
                     css += " forceReadonly";
                 }
                 htmlFieldsOptions(s, fId, cNm, css);
-            } else if (isD && StringUtil.endsWith(INPUT_READONLY_SUFFIXS, cNm)) { // 読み取り専用の場合
+            } else if (isD && StringUtil.endsWith(INPUT_RO_SUFS, cNm)) { // 読み取り専用の場合
                 String css = "";
-                if (c.getTypeName().matches(NUM_RE) && !StringUtil.endsWith(INT_NOFORMAT_SUFFIXS, cNm)) {
+                if (c.getTypeName().matches(NUM_RE) && !StringUtil.endsWith(INT_NOFORMAT_SUFS, cNm)) {
                     css = getNumericCss(c);
                 }
                 htmlFieldsSpan(s, fId, c, css);
@@ -1218,9 +1024,9 @@ public abstract class HtmlGenerator {
                 }
             } else if (isD && c.isSummary()) { // 詳細画面の集約先外部キー
                 htmlFieldsSpan(s, fId, c, "summary");
-            } else if (StringUtil.endsWith(TS_SUFS, cNm)) { // タイムスタンプの場合
+            } else if (StringUtil.endsWith(INPUT_TS_SUFS, cNm)) { // タイムスタンプの場合
                 htmlFieldsSpan(s, fId, c, "");
-            } else if (isD && StringUtil.endsWith(TEXTAREA_SUFFIXS, cNm)) { // テキストエリア項目の場合
+            } else if (isD && StringUtil.endsWith(INPUT_TX_SUFFIXS, cNm)) { // テキストエリア項目の場合
                 String css = "";
                 if (isD && c.getNullable() == 0) {
                     css += isNotBlank(c);
@@ -1230,7 +1036,7 @@ public abstract class HtmlGenerator {
                 String type = getInputType(cNm);
                 String inputCss = getInputCss(t, isD, c, cNm);
                 String format = getFormat(c, cNm);
-                if (!isD && StringUtil.endsWith(inputRangeSuffixs, cNm)) { // 検索画面の範囲指定項目の場合
+                if (!isD && StringUtil.endsWith(INPUT_RG_SUFS, cNm)) { // 検索画面の範囲指定項目の場合
                     if (t.isGraph()) {
                         inputCss += " notblank";
                     }
@@ -1238,7 +1044,7 @@ public abstract class HtmlGenerator {
                 } else if (((!t.isView() && !t.isStatusFlow()) || !isD) && c.getRefer() != null) { // 参照モデルの場合
                     s.add(htmlFieldsRefer(fId, type, inputCss, c, format, t, referCss));
                 } else {
-                    if (StringUtil.endsWith(INPUT_BIT_SUFFIXS, cNm)) {
+                    if (StringUtil.endsWith(INPUT_B_SUFS, cNm)) {
                         String tag = "          ";
                         tag += "<label for=\"" + fId + "F\" th:text=\"#{" + fId + "}\">" + c.getName().toUpperCase()
                                 + "</label>";
@@ -1297,7 +1103,7 @@ public abstract class HtmlGenerator {
      */
     public static String getFormat(final ColumnInfo c, final String colNm) {
         String format = "";
-        if (StringUtil.endsWith(INPUT_DATE8_SUFFIXS, colNm) && c.getColumnSize() == 8) { // 8桁日付項目
+        if (StringUtil.endsWith(INPUT_D8_SUFS, colNm) && c.getColumnSize() == 8) { // 8桁日付項目
             format = "yymmdd";
         }
         return format;
@@ -1335,13 +1141,13 @@ public abstract class HtmlGenerator {
             inputCss += isNotBlank(c);
         }
 
-        if (StringUtil.endsWith(INPUT_DATE_SUFFIXS, colNm)) { // 日付項目および8桁日付項目
+        if (StringUtil.endsWith(INPUT_BI_SUFS, colNm)) { // 日付項目および8桁日付項目
             inputCss += " datepicker";
-        } else if (StringUtil.endsWith(INPUT_DATE8_SUFFIXS, colNm) && c.getColumnSize() == 8) {
+        } else if (StringUtil.endsWith(INPUT_D8_SUFS, colNm) && c.getColumnSize() == 8) {
             inputCss += " datepicker";
-        } else if (StringUtil.endsWith(INPUT_TIME_SUFFIXS, colNm)) {
+        } else if (StringUtil.endsWith(INPUT_TM_SUFS, colNm)) {
             inputCss += " time";
-        } else if (StringUtil.endsWith(INPUT_BIT_SUFFIXS, colNm)) {
+        } else if (StringUtil.endsWith(INPUT_B_SUFS, colNm)) {
             inputCss += " bit right";
         }
 
@@ -1472,23 +1278,23 @@ public abstract class HtmlGenerator {
      */
     public static String getInputType(final String colName) {
 
-        if (StringUtil.endsWith(INPUT_DATETIME_SUFFIXS, colName)) {
+        if (StringUtil.endsWith(INPUT_DT_SUFS, colName)) {
             // 日時項目
             return "datetime-local";
 
-        } else if (StringUtil.endsWith(inputNumberSuffixs, colName)) {
+        } else if (StringUtil.endsWith(INPUT_NO_SUFS, colName)) {
             // 数値項目
             return "number";
 
-        } else if (StringUtil.endsWith(INPUT_YM_SUFFIXS, colName)) {
+        } else if (StringUtil.endsWith(INPUT_YM_SUFS, colName)) {
             // 年月項目
             return "month";
 
-        } else if (StringUtil.endsWith(INPUT_HOUR_SUFFIXS, colName)) {
+        } else if (StringUtil.endsWith(INPUT_HM_SUFS, colName)) {
             // 時刻項目
             return "time";
 
-        } else if (StringUtil.endsWith(FILE_SUFS, colName)) {
+        } else if (StringUtil.endsWith(INPUT_FILE_SUFS, colName)) {
             // ファイル
             return "file";
         }
@@ -1714,11 +1520,11 @@ public abstract class HtmlGenerator {
         }
 
         String forcePulldown = "";
-        if (StringUtil.endsWith(pulldownSuffixs, colName)) {
+        if (StringUtil.endsWith(INPUT_PD_SUFS, colName)) {
             forcePulldown = " data-force-pulldown=\"1\"";
         }
 
-        s.add("          <fieldset id=\"" + id + "List\" data-options=\"" + JSON + "\" data-optionParams=\"" + OPT_K
+        s.add("          <fieldset id=\"" + id + "List\" data-options=\"" + OPT_J + "\" data-optionParams=\"" + OPT_K
                 + ":" + colName + "\" data-optionValue=\"" + OPT_V + "\" data-optionLabel=\"" + OPT_L + "\""
                 + cssClass + forcePulldown + ">");
         s.add("            <legend th:text=\"#{" + id + "}\">" + colName + "</legend>");
@@ -1734,7 +1540,7 @@ public abstract class HtmlGenerator {
     private static void htmlFieldsMeta(final List<String> s, final String id, final ColumnInfo c) {
 
         String css = "";
-        if (StringUtil.endsWith(TS_SUFS, c.getName())) {
+        if (StringUtil.endsWith(INPUT_TS_SUFS, c.getName())) {
             css += " YmdHmsS";
         }
 
@@ -1756,7 +1562,7 @@ public abstract class HtmlGenerator {
             final String cssClass) {
 
         String css = cssClass;
-        if (StringUtil.endsWith(TS_SUFS, c.getName())) {
+        if (StringUtil.endsWith(INPUT_TS_SUFS, c.getName())) {
             css += " YmdHmsS";
         }
         if (!StringUtil.isNullOrWhiteSpace(css)) {
