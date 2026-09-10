@@ -21,12 +21,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.co.golorp.emarf.properties.App;
 
 /**
  * PdfUtil
  */
 public final class PdfUtil {
+
+    /** logger */
+    private static final Logger LOG = LoggerFactory.getLogger(PdfUtil.class);
 
     /** libreoffice */
     private static final String LIBRE_PATH = App.get("librePath");
@@ -84,11 +90,9 @@ public final class PdfUtil {
             // プロセスの終了を待機（C#の process.WaitForExit() に相当）
             exitCode = process.waitFor();
         } catch (IOException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
+            LOG.warn(e.getMessage());
         } catch (InterruptedException e) {
-            // TODO 自動生成された catch ブロック
-            e.printStackTrace();
+            LOG.warn(e.getMessage());
         }
 
         // 出力されるPDFのファイル名を組み立て

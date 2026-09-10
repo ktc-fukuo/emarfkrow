@@ -138,6 +138,11 @@ $(function() {
         let isSelectRow = $button.hasClass('selectRows');
         let formJson = Jsonate.toJson($form, isSelectRow);
 
+        // 削除ボタンなら変更が無くてもグリッドを含む
+        if ($button.hasClass('delete')) {
+            formJson = Jsonate.toJson($form, isSelectRow, true);
+        }
+
         for (let k in formJson) {
             let itemJson = formJson[k];
             if (Array.isArray(itemJson) && itemJson.length > 0 && k.match(/Grid$/)) {

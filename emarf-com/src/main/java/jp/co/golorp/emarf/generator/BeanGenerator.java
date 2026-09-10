@@ -409,9 +409,9 @@ public abstract class BeanGenerator {
         }
 
         if (bundle != null && bundle.containsKey("java.package.action")) {
-            PKG_A = bundle.getString("java.package.action") + ".model.base";
+            PKG_A = bundle.getString("java.package.action");
         } else {
-            PKG_A = "com.example.action.model.base";
+            PKG_A = "com.example.action";
         }
 
         if (bundle != null && bundle.containsKey("java.package.entity")) {
@@ -421,9 +421,9 @@ public abstract class BeanGenerator {
         }
 
         if (bundle != null && bundle.containsKey("java.package.form")) {
-            PKG_F = bundle.getString("java.package.form") + ".model.base";
+            PKG_F = bundle.getString("java.package.form");
         } else {
-            PKG_F = "com.example.form.model.base";
+            PKG_F = "com.example.form";
         }
 
         if (bundle != null && bundle.containsKey("grid.rows")) {
@@ -646,7 +646,7 @@ public abstract class BeanGenerator {
         EntityGenerator.generate(tables);
 
         //アクションフォルダ再作成
-        String actionPackagePath = PKG_A.replace(".", File.separator);
+        String actionPackagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String actionPackageDir = projectDir + File.separator + DIR_J + File.separator + actionPackagePath;
         FileUtil.reMkDir(actionPackageDir);
 
@@ -773,6 +773,7 @@ public abstract class BeanGenerator {
             int parents = child.getParents().size();
             if (parents == 1) {
 
+                s.add(sp + "        // 子：" + r + "の削除");
                 s.add(sp + "        java.util.List<" + PKG_E + "." + e + "> " + i + "s = " + p + ".refer" + e + "s();");
                 s.add(sp + "        if (" + i + "s != null) {");
                 s.add(sp + "            for (" + PKG_E + "." + e + " " + i + " : " + i + "s) {");

@@ -260,7 +260,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         if (!table.isView()) {
             for (String pk : table.getPrimaryKeys()) {
                 ColumnInfo primaryKey = table.getColumns().get(pk);
-                String gridColumn = htmlGridColumn(table, primaryKey, "");
+                String gridColumn = htmlGridColumn(table, primaryKey, "", "");
                 if (gridColumn != null) {
                     s.add("        " + gridColumn);
                 }
@@ -281,7 +281,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
             }
 
             ColumnInfo column = table.getColumns().get(columnName);
-            String gridColumn = htmlGridColumn(table, column, "");
+            String gridColumn = htmlGridColumn(table, column, "", "");
             if (gridColumn != null) {
                 s.add("        " + gridColumn);
             }
@@ -294,7 +294,7 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
                         continue;
                     }
                     ColumnInfo column = bro.getColumns().get(colName);
-                    String gridColumn = htmlGridColumn(bro, column, bro.getName() + ".");
+                    String gridColumn = htmlGridColumn(bro, column, bro.getName() + ".", table.getName());
                     if (gridColumn != null) {
                         s.add("        " + gridColumn);
                     }
@@ -318,10 +318,15 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
      * @param table
      * @param column
      * @param prefix フィールド名のプレフィクス（兄弟モデルのカラムを出力する際に、フィールド名が重複するのを避けるために使用）
+     * @param base
      * @return 列定義文字列
      */
-    private static String htmlGridColumn(final TableInfo table, final ColumnInfo column, final String prefix) {
+    private static String htmlGridColumn(final TableInfo table, final ColumnInfo column, final String prefix,
+            final String base) {
         String e = StringUtil.toPascalCase(table.getName());
+        if (!StringUtil.isNullOrWhiteSpace(base)) {
+            e = StringUtil.toPascalCase(base.replaceFirst("\\.$", ""));
+        }
         String n = column.getName();
         String m = "Messages['" + e + "Grid." + StringUtil.toCamelCase(n) + "']";
         boolean isUpdTs = n.matches("(?i)^" + UPDATE_AT + "$");

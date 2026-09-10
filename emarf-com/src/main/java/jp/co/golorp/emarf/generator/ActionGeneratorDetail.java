@@ -62,7 +62,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
      */
     private static void javaActionDetailRegist(final List<TableInfo> tables) {
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tables) {
@@ -75,7 +75,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String entity = StringUtil.toPascalCase(table.getName());
             String r = table.getRemarks();
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -177,7 +177,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "RegistAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "RegistAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + entity + "RegistAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -195,7 +195,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
      */
     private static void javaActionDetailGet(final List<TableInfo> tables) {
         // 出力フォルダを再作成
-        String pPath = PKG_A.replace(".", File.separator);
+        String pPath = (PKG_A + ".model.base").replace(".", File.separator);
         String pDir = getProjectDir() + File.separator + DIR_J + File.separator + pPath;
         Map<String, String> javaPaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tables) {
@@ -207,7 +207,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             //instance
             String ins = StringUtil.toCamelCase(table.getName());
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -332,7 +332,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = pDir + File.separator + ent + "GetAction.java";
-            javaPaths.put(javaFilePath, PKG_A + "." + ent + "GetAction");
+            javaPaths.put(javaFilePath, PKG_A + ".model.base." + ent + "GetAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -351,7 +351,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
     private static void javaActionDetailDelete(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -374,7 +374,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String e = StringUtil.toPascalCase(table.getName());
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -433,7 +433,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "DeleteAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "DeleteAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "DeleteAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -452,7 +452,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
     private static void javaActionDetailApply(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -468,7 +468,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -537,7 +537,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "ApplyAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "ApplyAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + entity + "ApplyAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -556,7 +556,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
     private static void javaActionDetailCancel(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -572,7 +572,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -641,7 +641,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "CancelAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "CancelAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + entity + "CancelAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -660,7 +660,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
     private static void javaActionDetailPermit(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -676,7 +676,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -745,7 +745,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "PermitAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "PermitAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + entity + "PermitAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -764,7 +764,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
     private static void javaActionDetailForbid(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -780,7 +780,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -849,7 +849,7 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "ForbidAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + entity + "ForbidAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + entity + "ForbidAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }

@@ -56,7 +56,7 @@ public final class FormGenerator extends BeanGenerator {
     public static void generate(final List<TableInfo> tables) {
 
         //フォームフォルダ
-        String pkgFormPath = PKG_F.replace(".", File.separator);
+        String pkgFormPath = (PKG_F + ".model.base").replace(".", File.separator);
         String pkgFormDir = getProjectDir() + File.separator + DIR_J + File.separator + pkgFormPath;
         FileUtil.reMkDir(pkgFormDir);
 
@@ -69,7 +69,7 @@ public final class FormGenerator extends BeanGenerator {
      * @param tableInfos テーブル情報のリスト
      */
     private static void javaFormDetailRegist(final List<TableInfo> tableInfos) {
-        String packagePath = PKG_F.replace(".", File.separator);
+        String packagePath = (PKG_F + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
         for (TableInfo table : tableInfos) {
@@ -78,7 +78,7 @@ public final class FormGenerator extends BeanGenerator {
             }
             String entity = StringUtil.toPascalCase(table.getName());
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_F + ";");
+            s.add("package " + PKG_F + ".model.base;");
             addImports(s);
             addAuthor(s, table.getRemarks() + "登録フォーム");
             s.add("public class " + entity + "RegistForm implements IForm {");
@@ -173,7 +173,7 @@ public final class FormGenerator extends BeanGenerator {
             javaFormDetailRegistRelCheck(table, s);
             s.add("}");
             String javaFilePath = packageDir + File.separator + entity + "RegistForm.java";
-            javaFilePaths.put(javaFilePath, PKG_F + "." + entity + "RegistForm");
+            javaFilePaths.put(javaFilePath, PKG_F + ".model.base." + entity + "RegistForm");
             FileUtil.writeFile(javaFilePath, s);
         }
         if (IS_GENERATE_AT_STARTUP) {
@@ -203,7 +203,7 @@ public final class FormGenerator extends BeanGenerator {
             String fromE = StringUtil.toPascalCase(from.getName());
             String fromI = StringUtil.toCamelCase(from.getName());
             s.add("");
-            s.add("        // " + from.getRemarks() + " の派生元チェック TODO できればAssertTrueにしたい");
+            s.add("        // " + from.getRemarks() + " の派生元チェック");
             s.add("        Map<String, Object> " + fromI + "Params = new java.util.HashMap<String, Object>();");
             String lastKey = null;
             for (String fromPrimaryKey : from.getPrimaryKeys()) {
@@ -220,7 +220,7 @@ public final class FormGenerator extends BeanGenerator {
             String fromE = StringUtil.toPascalCase(from.getName());
             String fromI = StringUtil.toCamelCase(from.getName());
             s.add("");
-            s.add("        // " + from.getRemarks() + " の共生元チェック TODO できればAssertTrueにしたい");
+            s.add("        // " + from.getRemarks() + " の共生元チェック");
             s.add("        Map<String, Object> " + fromI + "Params = new java.util.HashMap<String, Object>();");
             String lastKey = null;
             for (String fromPrimaryKey : from.getPrimaryKeys()) {
@@ -238,7 +238,7 @@ public final class FormGenerator extends BeanGenerator {
             String fromE = StringUtil.toPascalCase(from.getName());
             String fromI = StringUtil.toCamelCase(from.getName());
             s.add("");
-            s.add("        // " + from.getRemarks() + " の転生元チェック TODO できればAssertTrueにしたい");
+            s.add("        // " + from.getRemarks() + " の転生元チェック");
             s.add("        Map<String, Object> " + fromI + "Params = new java.util.HashMap<String, Object>();");
             String lastKey = null;
             for (String fromPrimaryKey : from.getPrimaryKeys()) {
@@ -256,7 +256,7 @@ public final class FormGenerator extends BeanGenerator {
             String fromE = StringUtil.toPascalCase(from.getName());
             String fromI = StringUtil.toCamelCase(from.getName());
             s.add("");
-            s.add("        // " + from.getRemarks() + " の集約先チェック TODO できればAssertTrueにしたい");
+            s.add("        // " + from.getRemarks() + " の集約先チェック");
             s.add("        Map<String, Object> " + fromI + "Params = new java.util.HashMap<String, Object>();");
             String lastKey = null;
             for (String fromPrimaryKey : from.getPrimaryKeys()) {
@@ -294,7 +294,7 @@ public final class FormGenerator extends BeanGenerator {
             TableInfo refer = column.getRefer();
             String p = StringUtil.toCamelCase(column.getName());
             s.add("");
-            s.add("        // " + column.getRemarks() + " のマスタチェック TODO できればAssertTrueにしたい");
+            s.add("        // " + column.getRemarks() + " のマスタチェック");
             s.add("        Map<String, Object> " + p + "Params = new java.util.HashMap<String, Object>();");
 
             // 該当する主キーと比べて、カラム名の接頭辞を判定する
@@ -490,7 +490,7 @@ public final class FormGenerator extends BeanGenerator {
     private static void javaFormIndexRegist(final List<TableInfo> tableInfos) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_F.replace(".", File.separator);
+        String packagePath = (PKG_F + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -507,7 +507,7 @@ public final class FormGenerator extends BeanGenerator {
             String instance = StringUtil.toCamelCase(tableName);
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_F + ";");
+            s.add("package " + PKG_F + ".model.base;");
             s.add("");
             s.add("import java.util.List;");
             s.add("import java.util.Map;");
@@ -560,7 +560,7 @@ public final class FormGenerator extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + entity + "SRegistForm.java";
-            javaFilePaths.put(javaFilePath, PKG_F + "." + entity + "SRegistForm");
+            javaFilePaths.put(javaFilePath, PKG_F + ".model.base." + entity + "SRegistForm");
 
             FileUtil.writeFile(javaFilePath, s);
         }

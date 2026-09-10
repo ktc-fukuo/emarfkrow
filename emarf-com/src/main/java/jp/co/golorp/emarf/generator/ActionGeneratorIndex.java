@@ -61,7 +61,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void deleteAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String pkgPath = PKG_A.replace(".", File.separator);
+        String pkgPath = (PKG_A + ".model.base").replace(".", File.separator);
         String pkgDir = getProjectDir() + File.separator + DIR_J + File.separator + pkgPath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -85,7 +85,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -132,8 +132,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             }
             s.add("");
             s.add("                " + e + " e = FormValidator.toBean(" + e + ".class.getName(), row);");
-            List<TableInfo> childInfos = table.getChildren();
-            BeanGenerator.getDeleteChilds(s, "e", childInfos, 2);
+            BeanGenerator.getDeleteChilds(s, "e", table.getChildren(), 2);
             s.add("                if (e.delete() != 1) {");
             s.add("                    throw new OptLockError(\"error.cant.delete\", \"" + remarks + "\");");
             s.add("                }");
@@ -153,7 +152,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = pkgDir + File.separator + e + "SDeleteAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SDeleteAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SDeleteAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -172,7 +171,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void registAction(final List<TableInfo> tableInfos) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -191,7 +190,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -272,7 +271,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SRegistAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SRegistAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SRegistAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -291,7 +290,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void applyAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -307,7 +306,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -392,7 +391,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SApplyAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SApplyAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SApplyAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -411,7 +410,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void cancelAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -427,7 +426,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -512,7 +511,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SCancelAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SCancelAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SCancelAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -531,7 +530,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void permitAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -547,7 +546,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -632,7 +631,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SPermitAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SPermitAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SPermitAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }
@@ -651,7 +650,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
     private static void forbidAction(final List<TableInfo> tables) {
 
         // 出力フォルダを再作成
-        String packagePath = PKG_A.replace(".", File.separator);
+        String packagePath = (PKG_A + ".model.base").replace(".", File.separator);
         String packageDir = getProjectDir() + File.separator + DIR_J + File.separator + packagePath;
 
         Map<String, String> javaFilePaths = new LinkedHashMap<String, String>();
@@ -667,7 +666,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             String remarks = table.getRemarks();
 
             List<String> s = new ArrayList<String>();
-            s.add("package " + PKG_A + ";");
+            s.add("package " + PKG_A + ".model.base;");
             s.add("");
             s.add("import java.time.LocalDateTime;");
             s.add("import java.util.HashMap;");
@@ -752,7 +751,7 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             s.add("}");
 
             String javaFilePath = packageDir + File.separator + e + "SForbidAction.java";
-            javaFilePaths.put(javaFilePath, PKG_A + "." + e + "SForbidAction");
+            javaFilePaths.put(javaFilePath, PKG_A + ".model.base." + e + "SForbidAction");
 
             FileUtil.writeFile(javaFilePath, s);
         }

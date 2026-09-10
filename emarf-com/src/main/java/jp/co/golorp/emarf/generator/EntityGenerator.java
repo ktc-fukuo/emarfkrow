@@ -58,6 +58,7 @@ public final class EntityGenerator extends BeanGenerator {
             s.add("package " + PKG_E + ";");
             s.add("");
             s.add("import jp.co.golorp.emarf.entity.IEntity;");
+            s.add("import jp.co.golorp.emarf.lang.StringUtil;");
             s.add("import jp.co.golorp.emarf.util.IgnoreCaseLinkedMap;");
             s.add("");
             s.add("/**");
@@ -112,7 +113,7 @@ public final class EntityGenerator extends BeanGenerator {
                 }
                 s.add("    public " + t + " get" + a + "() {");
                 if (t.equals("String") && StringUtil.endsWith(INPUT_YM_SUFS, n)) {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + p + ")) {");
+                    s.add("        if (!StringUtil.isNullOrWhiteSpace(this." + p + ")) {");
                     s.add("            return this." + p + ".substring(0, 4) + \"-\" + this." + p + ".substring(4);");
                     s.add("        }");
                 }
@@ -126,44 +127,31 @@ public final class EntityGenerator extends BeanGenerator {
                     s.add("    @jp.co.golorp.emarf.validation.OptLock");
                 }
                 s.add("    public void set" + a + "(final Object o) {");
-                s.add("        this." + p + " = null;");
                 if (t.equals("java.time.LocalDateTime")) {
-                    s.add("        if (o != null && o instanceof Long) {");
-                    s.add("            java.util.Date d = new java.util.Date((Long) o);");
-                    s.add("            this." + p
-                            + " = java.time.LocalDateTime.ofInstant(d.toInstant(), java.time.ZoneId.systemDefault());");
-                    s.add("        } else if (o != null && o.toString().matches(\"^[0-9]+\")) {");
-                    s.add("            java.util.Date d = new java.util.Date(Long.valueOf(o.toString()));");
-                    s.add("            this." + p
-                            + " = java.time.LocalDateTime.ofInstant(d.toInstant(), java.time.ZoneId.systemDefault());");
-                    s.add("        } else if (o != null && o.toString().matches(\"^.+\\\\+\\\\d{2}:\\\\d{2}$\")) {");
-                    s.add("            java.time.Instant instant = java.time.Instant.parse(o.toString());");
-                    s.add("            this." + p
-                            + " = java.time.LocalDateTime.ofInstant(instant, java.time.ZoneId.systemDefault());");
-                    s.add("        } else if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
-                    s.add("            this." + p + " = " + t
-                            + ".parse(o.toString().replace(\" \", \"T\").replace(\"/\", \"-\"));");
+                    s.add("        this." + p + " = jp.co.golorp.emarf.time.DateTimeUtil.parse(o);");
                 } else if (t.equals("java.time.LocalDate")) {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
+                    s.add("        this." + p + " = null;");
+                    s.add("        if (!StringUtil.isNullOrWhiteSpace(o)) {");
                     s.add("            this." + p + " = " + t + ".parse(o.toString().substring(0, 10));");
+                    s.add("        }");
                 } else if (t.equals("java.time.LocalTime")) {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
+                    s.add("        this." + p + " = null;");
+                    s.add("        if (!StringUtil.isNullOrWhiteSpace(o)) {");
                     s.add("            String text = o.toString().replaceFirst(\"^\\\\d+[\\\\/|\\\\-]\\\\d+[\\\\/|\\\\-]\\\\d+ \", \"\");");
                     s.add("            this." + p + " = " + t + ".parse(text);");
+                    s.add("        }");
                 } else if (t.equals("java.math.BigDecimal")) {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
-                    s.add("            this." + p + " = new java.math.BigDecimal(o.toString());");
+                    s.add("        this." + p + " = StringUtil.ifNullBigDecimal(o);");
                 } else if (StringUtil.endsWith(INPUT_YM_SUFS, n)) {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
+                    s.add("        this." + p + " = null;");
+                    s.add("        if (!StringUtil.isNullOrWhiteSpace(o)) {");
                     s.add("            this." + p + " = " + t + ".valueOf(o.toString().replace(\"-\", \"\"));");
+                    s.add("        }");
                 } else if (t.equals("String")) {
-                    s.add("        if (o != null) {");
-                    s.add("            this." + p + " = o.toString();");
+                    s.add("        this." + p + " = StringUtil.ifNull(o);");
                 } else {
-                    s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
-                    s.add("            this." + p + " = " + t + ".valueOf(o.toString());");
+                    s.add("        this." + p + " = StringUtil.ifNull" + t + "(o);");
                 }
-                s.add("        }");
                 s.add("    }");
                 if (!table.isView() && column.getRefer() != null) { // 子モデルgridで補填用の参照名
                     i = addSanshoMei(s, table, column, i);
@@ -228,7 +216,7 @@ public final class EntityGenerator extends BeanGenerator {
             if (i++ > 0) {
                 t += "} else ";
             }
-            t += "if (jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + camel + ")) {";
+            t += "if (StringUtil.isNullOrWhiteSpace(this." + camel + ")) {";
             s.add(t);
             s.add("            return true;");
         }
@@ -237,7 +225,7 @@ public final class EntityGenerator extends BeanGenerator {
         }
         if (table.getColumns().containsKey(UPDATE_AT)) {
             String camel = StringUtil.toCamelCase(UPDATE_AT);
-            s.add("        if (jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(this." + camel + ")) {");
+            s.add("        if (StringUtil.isNullOrWhiteSpace(this." + camel + ")) {");
             s.add("            return true; // 楽観ロック値がなくてもINSERT");
             s.add("        }");
         }
@@ -281,10 +269,7 @@ public final class EntityGenerator extends BeanGenerator {
             s.add("");
             s.add("    /** @param o id */");
             s.add("    public final void setId(final Object o) {");
-            s.add("        this.id = null;");
-            s.add("        if (!jp.co.golorp.emarf.lang.StringUtil.isNullOrWhiteSpace(o)) {");
-            s.add("            this.id = Integer.valueOf(o.toString());");
-            s.add("        }");
+            s.add("        this.id = StringUtil.ifNullInteger(o);");
             s.add("    }");
         }
         return i;
@@ -1106,7 +1091,7 @@ public final class EntityGenerator extends BeanGenerator {
                     String ent = StringUtil.toPascalCase(child.getName());
                     String ins = StringUtil.toCamelCase(child.getName());
                     String r = child.getRemarks();
-                    s.add("        // " + child.getRemarks() + "の削除");
+                    s.add("        // 子：" + child.getRemarks() + "の削除");
                     s.add("        if (this." + ins + "s != null) {");
                     s.add("            for (" + ent + " " + ins + " : this." + ins + "s) {");
                     // TODO グリッドの削除ボタンで、友連れ削除時に、更新日時の不一致で削除されない問題
@@ -1139,7 +1124,7 @@ public final class EntityGenerator extends BeanGenerator {
                     }
                     String b = StringUtil.toCamelCase(bro.getName());
                     String r = bro.getRemarks();
-                    s.add("        // " + bro.getRemarks() + "の削除");
+                    s.add("        // 兄弟：" + bro.getRemarks() + "の削除");
                     s.add("        if (this." + b + " != null) {");
                     // TODO グリッドの削除ボタンで、友連れ削除時に、更新日時の不一致で削除されない問題
                     s.add("            if (this." + b + ".delete() != 1) {");

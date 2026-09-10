@@ -23,6 +23,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+import jp.co.golorp.emarf.lang.StringUtil;
+
 /**
  * LocalDateTimeのラッパ（テスト用の日時を使用するため）
  *
@@ -88,6 +90,38 @@ public final class DateTimeUtil {
     public static LocalDateTime parse(final String s, final String format) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return LocalDateTime.parse(s, formatter);
+    }
+
+    /**
+     * @param o
+     * @return LocalDateTime
+     */
+    public static LocalDateTime parse(final Object o) {
+
+        if (o != null) {
+
+            if (o instanceof Long) {
+
+                Date d = new Date((Long) o);
+                return LocalDateTime.ofInstant(d.toInstant(), ZoneId.systemDefault());
+
+            } else if (o.toString().matches("^[0-9]+")) {
+
+                Date d = new Date(Long.valueOf(o.toString()));
+                return LocalDateTime.ofInstant(d.toInstant(), ZoneId.systemDefault());
+
+            } else if (o.toString().matches("^.+\\+\\d{2}:\\d{2}$")) {
+
+                Instant instant = Instant.parse(o.toString());
+                return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+
+            } else if (!StringUtil.isNullOrWhiteSpace(o)) {
+
+                return LocalDateTime.parse(o.toString().replace(" ", "T").replace("/", "-"));
+            }
+        }
+
+        return null;
     }
 
 }

@@ -33,7 +33,7 @@ let Jsonate = {
     /**
      * フォームをJSON化
      */
-    toJson: function($form, isSelectRow) {
+    toJson: function($form, isSelectRow, isForceGrid) {
 
         let formJson = {};
 
@@ -103,7 +103,11 @@ let Jsonate = {
 
                     // 変更有無のチェック
                     let updated = false;
-                    if (!grid.orgData || !grid.orgData[r]) {
+                    if (isForceGrid) {
+                        // 変更有無を無視する場合
+                        updated = true;
+                        postData.push(gridRow);
+                    } else if (!grid.orgData || !grid.orgData[r]) {
                         // 元データがない場合
                         updated = true;
                         postData.push(gridRow);

@@ -20,6 +20,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.NotImplementedException;
+
 import jp.co.golorp.emarf.util.MapList;
 
 /**
@@ -133,32 +135,27 @@ public final class DataSourcesAssistSQLite extends DataSourcesAssist {
 
     @Override
     public String dateAdd(final String columnName, final int d) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public String nvlSysdate(final String columnName) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public String nvlZero(final String columnName) {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public String sysDate() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override
     public String sysTimestamp() {
-        // TODO 自動生成されたメソッド・スタブ
-        return null;
+        throw new NotImplementedException();
     }
 
     @Override

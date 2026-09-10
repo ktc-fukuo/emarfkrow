@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -105,7 +106,7 @@ public final class ServletUtil {
         String actionName = lastPath.replaceFirst(".[a-z]+$", "") + "Action";
         servletPathes[servletPathes.length - 1] = actionName;
 
-        BaseAction a = extracted(request, servletPathes, actionName);
+        BaseAction a = seekAction(request, servletPathes, actionName);
 
         return a;
     }
@@ -117,10 +118,13 @@ public final class ServletUtil {
      */
     public static BaseAction getAction(final HttpServletRequest request, final String actionName) {
 
-        BaseAction a = extracted(request, null, actionName);
+        BaseAction a = seekAction(request, null, actionName);
 
         return a;
     }
+
+    /** クラスキャッシュ */
+    private static ConcurrentHashMap<String, Class<?>> actionCache = new ConcurrentHashMap<String, Class<?>>();
 
     /**
      * @param request
@@ -128,8 +132,10 @@ public final class ServletUtil {
      * @param actionName
      * @return BaseAction
      */
-    private static BaseAction extracted(final HttpServletRequest request, final String[] servletPathes,
+    private static BaseAction seekAction(final HttpServletRequest request, final String[] servletPathes,
             final String actionName) {
+
+        String theName = null;
 
         BaseAction a = null;
 
@@ -140,7 +146,14 @@ public final class ServletUtil {
             if (servletPathes != null) {
                 className += String.join(".", servletPathes);
             }
-            a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+            theName = className;
+
+            if (actionCache.containsKey(className)) {
+                a = (BaseAction) actionCache.get(className).getDeclaredConstructor().newInstance();
+            } else {
+                a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                actionCache.put(theName, a.getClass());
+            }
 
         } catch (Exception e) {
             try {
@@ -148,6 +161,7 @@ public final class ServletUtil {
                 // モデルパッケージからも、拡張アクションを取ってみる
                 String className = BeanGenerator.PKG_A + ".model." + actionName;
                 a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                actionCache.put(theName, a.getClass());
 
             } catch (Exception e1) {
                 try {
@@ -155,6 +169,7 @@ public final class ServletUtil {
                     // モデルのベースパッケージからも、基底アクションを取ってみる
                     String className = BeanGenerator.PKG_A + ".model.base." + actionName;
                     a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                    actionCache.put(theName, a.getClass());
 
                 } catch (Exception e2) {
                     if (actionName.endsWith("SearchAction")) {
@@ -163,6 +178,7 @@ public final class ServletUtil {
                             // 検索処理の基底クラスを取ってみる
                             String className = "jp.co.golorp.emarf.action.SearchAction";
                             a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                            actionCache.put(theName, a.getClass());
 
                         } catch (Exception e3) {
                             throw new SysError(e);
@@ -173,6 +189,7 @@ public final class ServletUtil {
                             // 選択検索処理の基底クラスを取ってみる
                             String className = "jp.co.golorp.emarf.action.CorrectAction";
                             a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                            actionCache.put(theName, a.getClass());
 
                         } catch (Exception e3) {
                             throw new SysError(e);
@@ -183,6 +200,7 @@ public final class ServletUtil {
                             // 照会処理の基底クラスを取ってみる
                             String className = "jp.co.golorp.emarf.action.GetAction";
                             a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                            actionCache.put(theName, a.getClass());
 
                         } catch (Exception e3) {
                             throw new SysError(e);
@@ -193,6 +211,7 @@ public final class ServletUtil {
                             // ダウンロード処理の基底クラスを取ってみる
                             String className = "jp.co.golorp.emarf.action.DownloadAction";
                             a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                            actionCache.put(theName, a.getClass());
 
                         } catch (Exception e3) {
                             throw new SysError(e);
@@ -203,6 +222,7 @@ public final class ServletUtil {
                             // 認可処理の基底クラスを取ってみる
                             String className = "jp.co.golorp.emarf.action.AuthzAction";
                             a = (BaseAction) (Class.forName(className)).getDeclaredConstructor().newInstance();
+                            actionCache.put(theName, a.getClass());
 
                         } catch (Exception e3) {
                             throw new SysError(e);

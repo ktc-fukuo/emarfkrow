@@ -16,6 +16,7 @@ limitations under the License.
 
 package jp.co.golorp.emarf.lang;
 
+import java.math.BigDecimal;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -429,6 +430,45 @@ public final class StringUtil {
         byte[] bytes = md.digest(s.getBytes());
 
         return Hex.encodeHexString(bytes);
+    }
+
+    /**
+     * @param o
+     * @return String
+     */
+    public static String ifNull(final Object o) {
+
+        if (!StringUtil.isNullOrWhiteSpace(o)) {
+            return o.toString();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param o
+     * @return Integer
+     */
+    public static Integer ifNullInteger(final Object o) {
+
+        if (!StringUtil.isNullOrWhiteSpace(o)) {
+            return Integer.valueOf(o.toString());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param o
+     * @return BigDecimal
+     */
+    public static BigDecimal ifNullBigDecimal(final Object o) {
+
+        if (!StringUtil.isNullOrWhiteSpace(o)) {
+            return new BigDecimal(o.toString());
+        }
+
+        return null;
     }
 
 }

@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -408,6 +409,9 @@ public final class Queries {
         }
     }
 
+    /** クラスキャッシュ */
+    private static ConcurrentHashMap<String, Class<?>> classCache = new ConcurrentHashMap<String, Class<?>>();
+
     /**
      * {@link ResultSet}をエンティティクラスのリストに変換
      * @param <T> 返却クラス
@@ -434,7 +438,13 @@ public final class Queries {
 
             // 兄弟モデルならスキップ
             String typeName = fieldType.getTypeName();
-            Class<?> fieldClass = Class.forName(typeName);
+            Class<?> fieldClass = null;
+            if (classCache.containsKey(typeName)) {
+                fieldClass = classCache.get(typeName);
+            } else {
+                fieldClass = Class.forName(typeName);
+                classCache.put(typeName, fieldClass);
+            }
             Class<?>[] interfaces = fieldClass.getInterfaces();
             if (interfaces.length > 0 && interfaces[0] == IEntity.class) {
                 continue;
@@ -505,6 +515,7 @@ public final class Queries {
             return s;
         }
 
+        // サーブレットコンテキスト内のSQLファイルをロード
         s = Queries.loadSqlFile(c, sqlPathes, sqlName);
         if (s != null) {
             return s;
