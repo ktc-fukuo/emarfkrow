@@ -749,7 +749,7 @@ public abstract class BeanGenerator {
      * @param childs
      * @param indent
      */
-    public static void getDeleteChilds(final List<String> s, final String p, final List<TableInfo> childs,
+    public static void getCheckChilds(final List<String> s, final String p, final List<TableInfo> childs,
             final int indent) {
 
         String sp = "    ".repeat(indent);
@@ -760,40 +760,46 @@ public abstract class BeanGenerator {
                 continue;
             }
 
-            s.add("");
-
             String r = child.getRemarks();
-
-            // entity
             String e = StringUtil.toPascalCase(child.getName());
-
-            // instance
             String i = StringUtil.toCamelCase(child.getName());
 
             int parents = child.getParents().size();
             if (parents == 1) {
-
-                s.add(sp + "        // 子：" + r + "の削除");
-                s.add(sp + "        java.util.List<" + PKG_E + "." + e + "> " + i + "s = " + p + ".refer" + e + "s();");
-                s.add(sp + "        if (" + i + "s != null) {");
-                s.add(sp + "            for (" + PKG_E + "." + e + " " + i + " : " + i + "s) {");
-                if (child.getChildren().size() > 0) {
-                    // forでもう一段降りているから「+2」
-                    getDeleteChilds(s, i, child.getChildren(), indent + 2);
-                }
+                // s.add(sp + "        // 子：" + r + "の削除");
+                // s.add(sp + "        java.util.List<" + PKG_E + "." + e + "> " + i + "s = " + p + ".refer" + e + "s();");
+                // s.add(sp + "        if (" + i + "s != null) {");
+                // s.add(sp + "            for (" + PKG_E + "." + e + " " + i + " : " + i + "s) {");
+                // if (child.getChildren().size() > 0) {
+                // // forでもう一段降りているから「+2」
+                // getCheckChilds(s, i, child.getChildren(), indent + 2);
+                // }
+                // s.add("");
+                // s.add(sp + "                if (" + i + ".delete() != 1) {");
+                // s.add(sp + "                    throw new OptLockError(\"error.cant.delete\", \"" + r + "\");");
+                // s.add(sp + "                }");
+                // s.add(sp + "            }");
+                // s.add(sp + "        }");
                 s.add("");
-                s.add(sp + "                if (" + i + ".delete() != 1) {");
-                s.add(sp + "                    throw new OptLockError(\"error.cant.delete\", \"" + r + "\");");
-                s.add(sp + "                }");
-                s.add(sp + "            }");
+                s.add(sp + "        // 子：" + r + "を全て指定済みか確認");
+                s.add(sp + "        int org" + e + "sSize = e.get" + e + "s().size();");
+                s.add(sp + "        if (e.refer" + e + "s().size() != org" + e + "sSize) {");
+                s.add(sp + "            throw new OptLockError(\"error.cant.delete\", \"" + r + "\");");
                 s.add(sp + "        }");
-
+                if (child.getChildren().size() > 0) {
+                    s.add(sp + "        for (" + PKG_E + "." + e + " " + i + " : " + p + ".get" + e + "s()) {");
+                    for (TableInfo mago : child.getChildren()) {
+                        s.add(sp + "            " + i + ".nest" + StringUtil.toPascalCase(mago.getName()) + "s();");
+                    }
+                    s.add(sp + "        }");
+                }
             } else {
-
-                s.add(sp + "        // child:" + e + ", parents:" + parents);
+                s.add("");
+                s.add(sp + "        // 子：" + r + "の親が複数存在するため、" + r + "の指定があるならエラーにする");
+                s.add(sp + "        if (e.get" + e + "s().size() > 0) {");
+                s.add(sp + "            throw new OptLockError(\"error.cant.delete.prior\", \"" + r + "\");");
+                s.add(sp + "        }");
             }
-
-            s.add("");
         }
     }
 

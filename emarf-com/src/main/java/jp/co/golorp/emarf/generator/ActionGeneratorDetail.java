@@ -419,8 +419,9 @@ public final class ActionGeneratorDetail extends BeanGenerator {
             s.add("");
             s.add("        " + e + " e = FormValidator.toBean(" + e + ".class.getName(), form);");
 
-            BeanGenerator.getDeleteChilds(s, "e", table.getChildren(), 0);
+            BeanGenerator.getCheckChilds(s, "e", table.getChildren(), 0);
 
+            s.add("");
             s.add("        if (e.delete() != 1) {");
             s.add("            throw new OptLockError(\"error.cant.delete\", \"" + table.getRemarks() + "\");");
             s.add("        }");

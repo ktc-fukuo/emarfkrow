@@ -1094,7 +1094,6 @@ public final class EntityGenerator extends BeanGenerator {
                     s.add("        // 子：" + child.getRemarks() + "の削除");
                     s.add("        if (this." + ins + "s != null) {");
                     s.add("            for (" + ent + " " + ins + " : this." + ins + "s) {");
-                    // TODO グリッドの削除ボタンで、友連れ削除時に、更新日時の不一致で削除されない問題
                     s.add("                if (" + ins + ".delete() != 1) {");
                     s.add("                    throw new jp.co.golorp.emarf.exception.OptLockError(\"error.cant.delete\", \""
                             + r + "\");");
@@ -1126,7 +1125,6 @@ public final class EntityGenerator extends BeanGenerator {
                     String r = bro.getRemarks();
                     s.add("        // 兄弟：" + bro.getRemarks() + "の削除");
                     s.add("        if (this." + b + " != null) {");
-                    // TODO グリッドの削除ボタンで、友連れ削除時に、更新日時の不一致で削除されない問題
                     s.add("            if (this." + b + ".delete() != 1) {");
                     s.add("                throw new jp.co.golorp.emarf.exception.OptLockError(\"error.cant.delete\", \""
                             + r + "\");");
@@ -1135,6 +1133,7 @@ public final class EntityGenerator extends BeanGenerator {
                     s.add("");
                 }
             }
+
             // ファイル列がある場合
             for (String columnName : table.getColumns().keySet()) {
                 if (StringUtil.endsWith(INPUT_FILE_SUFS, columnName)) {
@@ -1200,11 +1199,8 @@ public final class EntityGenerator extends BeanGenerator {
      */
     private static int addChilds(final List<String> s, final int jsonIndex, final TableInfo table,
             final TableInfo child) {
-
         int i = jsonIndex;
-
         String parent = StringUtil.toPascalCase(table.getName());
-
         String params = "";
         for (String pk : table.getPrimaryKeys()) {
             if (pk.length() > 0) {
@@ -1214,11 +1210,8 @@ public final class EntityGenerator extends BeanGenerator {
                 params += "this." + StringUtil.toCamelCase(pk);
             }
         }
-
         String ent = StringUtil.toPascalCase(child.getName());
-
         String ins = StringUtil.toCamelCase(child.getName());
-
         s.add("");
         s.add("    /** " + child.getRemarks() + "のリスト */");
         s.add("    private java.util.List<" + ent + "> " + ins + "s;");
@@ -1247,9 +1240,7 @@ public final class EntityGenerator extends BeanGenerator {
         s.add("        this." + ins + "s = " + parent + ".refer" + ent + "s(" + params + ");");
         s.add("        return this." + ins + "s;");
         s.add("    }");
-
-        // refer
-        s.add("");
+        s.add(""); // refer
         s.add("    /**");
         int paramIndex = 0;
         String pks = "";
@@ -1279,12 +1270,10 @@ public final class EntityGenerator extends BeanGenerator {
                 }
             }
         }
-
-        //カラム名を列挙
         s.add("        String sql = \"SELECT \";");
         int cols = 0;
         int refs = 0;
-        for (ColumnInfo column : child.getColumns().values()) {
+        for (ColumnInfo column : child.getColumns().values()) { //カラム名を列挙
             String quoteEscaped = ASSIST.quoteEscapedSQL(column.getName());
             //時間サフィックスに合致する場合、データソースがOracleならTO_CHAR
             if (StringUtil.endsWith(INPUT_BI_SUFS, column.getName())) {
@@ -1302,8 +1291,7 @@ public final class EntityGenerator extends BeanGenerator {
                 s.add("        sql += \", " + quoteEscaped + "\";");
             }
             ++cols;
-            // 列の参照モデル情報があればカラム名の補完
-            if (column.getRefer() != null) {
+            if (column.getRefer() != null) { // 列の参照モデル情報があればカラム名の補完
                 String meiSql = SqlGenerator.getMeiSql(refs, table, column);
                 if (meiSql != null) {
                     ++refs;
@@ -1339,13 +1327,24 @@ public final class EntityGenerator extends BeanGenerator {
             }
             s.add("        map.put(\"" + StringUtil.toSnakeCase(pk) + "\", param" + ++paramIndex + ");");
         }
-        //        s.add("        return Queries.select(sql, map, " + ent + ".class, null, null);");
         s.add("        java.util.List<" + ent + "> list = jp.co.golorp.emarf.sql.Queries.select(sql, map, " + ent
                 + ".class, null, null);");
         s.add("        if (list != null) {");
         s.add("            return list;");
         s.add("        }");
         s.add("        return new java.util.ArrayList<" + ent + ">();");
+        s.add("    }");
+        s.add("");
+        s.add("    /** " + child.getRemarks() + "を再帰 */");
+        s.add("    public void nest" + ent + "s() {");
+        s.add("        this." + ins + "s = " + parent + ".refer" + ent + "s(" + params + ");");
+        if (child.getChildren().size() > 0) {
+            s.add("        for (" + ent + " " + ins + " : this." + ins + "s) {");
+            for (TableInfo mago : child.getChildren()) {
+                s.add("            " + ins + ".nest" + StringUtil.toPascalCase(mago.getName()) + "s();");
+            }
+            s.add("        }");
+        }
         s.add("    }");
         return i;
     }

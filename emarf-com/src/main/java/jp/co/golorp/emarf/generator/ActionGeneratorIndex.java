@@ -132,7 +132,10 @@ public final class ActionGeneratorIndex extends BeanGenerator {
             }
             s.add("");
             s.add("                " + e + " e = FormValidator.toBean(" + e + ".class.getName(), row);");
-            BeanGenerator.getDeleteChilds(s, "e", table.getChildren(), 2);
+
+            BeanGenerator.getCheckChilds(s, "e", table.getChildren(), 2);
+
+            s.add("");
             s.add("                if (e.delete() != 1) {");
             s.add("                    throw new OptLockError(\"error.cant.delete\", \"" + remarks + "\");");
             s.add("                }");
