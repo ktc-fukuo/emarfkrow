@@ -63,7 +63,10 @@ public final class DataSourcesAssistPostgreSQL extends DataSourcesAssist {
         sql += "WHERE ";
         sql += "    c.relname = '" + tableName + "'";
         MapList mapList = Queries.select(sql, null, null);
-        return mapList.get(0).get("TABLE_COMMENT").toString();
+        if (mapList != null && !mapList.isEmpty()) {
+            return mapList.get(0).get("TABLE_COMMENT").toString();
+        }
+        return null;
     }
 
     @Override
@@ -223,7 +226,6 @@ public final class DataSourcesAssistPostgreSQL extends DataSourcesAssist {
 
     @Override
     public int getColumnSize(final ResultSet columns) throws SQLException {
-        // TODO postgresで確認
         return columns.getInt("COLUMN_SIZE");
     }
 

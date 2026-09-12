@@ -43,7 +43,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
     private static final Logger LOG = LoggerFactory.getLogger(HtmlGenerator.class);
 
     /** 数値項目の正規表現 */
-    protected static final String NUM_RE = "INT|DECIMAL|DOUBLE|NUMBER|NUMERIC";
+    protected static final String NUM_RE = "INT.*|DECIMAL|DOUBLE|NUMBER|NUMERIC";
 
     /** グリッド列幅ピクセル乗数 */
     protected static final int COLUMN_WIDTH_PX_MULTIPLIER = 10;
@@ -435,7 +435,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
                     ColumnInfo primaryKey = summaryOf.getColumns().get(pk);
                     String p = StringUtil.toCamelCase(pk);
                     s.add("        <div class=\"summary " + m + "s\">");
-                    s.add("          <label>" + primaryKey.getName() + ": </label>");
+                    s.add("          <label>" + primaryKey.getName().toUpperCase() + ": </label>");
                     s.add("          <span id=\"" + m + "." + p + "\"></span>");
                     s.add("          <input type=\"hidden\" id=\"" + m + "." + p + "\" name=\"" + m + "." + p
                             + "\" />");
@@ -1207,7 +1207,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
         if (table.getRebornFrom() != null) {
             TableInfo reFrom = table.getRebornFrom();
             for (String pk : reFrom.getPrimaryKeys()) {
-                if (column.getName().equals(pk)) {
+                if (column.getName().equals(pk.toLowerCase()) || column.getName().equals(pk.toUpperCase())) {
                     rebornFrom = reFrom;
                     break;
                 }
@@ -1525,9 +1525,9 @@ public abstract class HtmlGenerator extends BeanGenerator {
         }
 
         s.add("          <fieldset id=\"" + id + "List\" data-options=\"" + OPT_J + "\" data-optionParams=\"" + OPT_K
-                + ":" + colName + "\" data-optionValue=\"" + OPT_V + "\" data-optionLabel=\"" + OPT_L + "\""
-                + cssClass + forcePulldown + ">");
-        s.add("            <legend th:text=\"#{" + id + "}\">" + colName + "</legend>");
+                + ":" + colName.toUpperCase() + "\" data-optionValue=\"" + OPT_V + "\" data-optionLabel=\"" + OPT_L
+                + "\"" + cssClass + forcePulldown + ">");
+        s.add("            <legend th:text=\"#{" + id + "}\">" + colName.toUpperCase() + "</legend>");
         s.add("          </fieldset>");
     }
 
@@ -1545,7 +1545,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
         }
 
         String tag = "          ";
-        tag += "<label th:text=\"#{" + id + "}\" class=\"meta\">" + c.getName() + "</label>";
+        tag += "<label th:text=\"#{" + id + "}\" class=\"meta\">" + c.getName().toUpperCase() + "</label>";
         tag += "<span id=\"" + id + "\" class=\"meta" + css + "\"></span>";
         tag += "<input type=\"hidden\" id=\"" + id + "\" name=\"" + id + "\" class=\"meta\" />";
         s.add(tag);
@@ -1569,7 +1569,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
             css = " class=\"" + css + "\"";
         }
         String tag = "          ";
-        tag += "<label th:text=\"#{" + id + "}\">" + c.getName() + "</label>";
+        tag += "<label th:text=\"#{" + id + "}\">" + c.getName().toUpperCase() + "</label>";
         tag += "<span id=\"" + id + "\"" + css + "></span>";
         tag += "<input type=\"hidden\" id=\"" + id + "\" name=\"" + id + "\"" + css + " />";
         s.add(tag);
@@ -1641,7 +1641,7 @@ public abstract class HtmlGenerator extends BeanGenerator {
                 String referFor = " data-referFor=\"" + entityName + "." + StringUtil.toCamelCase(srcKey) + "\"";
                 String dataJson = " data-json=\"" + referName + "Search.json\"";
                 String srcDef = " data-srcDef=\"" + srcDefs + "\"";
-                String destDef = " data-destDef=\"" + srcMeiName + ":" + destVal + "\"";
+                String destDef = " data-destDef=\"" + srcMeiName + ":" + destVal.toUpperCase() + "\"";
                 return referFor + dataJson + srcDef + destDef;
             }
         }

@@ -451,7 +451,6 @@ public final class HtmlGeneratorIndex extends HtmlGenerator {
         } else if (StringUtil.endsWith(INPUT_TX_SUFFIXS, n)) {
             return "Column.longText('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";
         } else if (type.matches(NUM_RE) && !StringUtil.endsWith(INT_NOFORMAT_SUFS, n)) {
-            // TODO postgresで確認
             return getNumericColumn(column, prefix + cId, m, w, css, format);
         } else {
             return "Column.text('" + prefix + cId + "', " + m + ", " + w + ", '" + css + "', " + format + "),";

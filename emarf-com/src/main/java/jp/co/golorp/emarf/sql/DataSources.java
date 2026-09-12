@@ -236,7 +236,6 @@ public final class DataSources {
                     }
                     column.setTypeName(typeName.toUpperCase());
                     column.setColumnSize(assist.getColumnSize(columns)); // カラムサイズ
-                    // TODO postgresで確認・viewでnullを引いているケースはcastを入れる
                     //                    if (column.getColumnSize() == 0) {
                     //                        column.setColumnSize(3);
                     //                    }
@@ -579,7 +578,7 @@ public final class DataSources {
         String typeName = column.getTypeName().toUpperCase();
         String dataType = typeName;
 
-        if (typeName.startsWith("INT")
+        if ((typeName.startsWith("INT") && !typeName.equals("INT8"))
                 || (typeName.equals("NUMBER") && column.getColumnSize() <= 10 && column.getDecimalDigits() == 0)) {
 
             dataType = "Integer";
@@ -591,7 +590,7 @@ public final class DataSources {
             }
 
         } else if (typeName.equals("DECIMAL") || typeName.equals("DOUBLE") || typeName.equals("NUMBER")
-                || typeName.equals("NUMERIC")) {
+                || typeName.equals("NUMERIC") || typeName.equals("INT8")) {
 
             dataType = "java.math.BigDecimal";
 

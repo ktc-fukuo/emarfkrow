@@ -170,7 +170,8 @@ public final class HtmlGeneratorGantt extends HtmlGenerator {
             if (col.getName().matches("(?i)^(id|name|start|end|dependencies)$")) {
                 continue;
             }
-            s.add("            task." + StringUtil.toCamelCase(col.getName()) + " = row." + col.getName() + ";");
+            s.add("            task." + StringUtil.toCamelCase(col.getName()) + " = row." + col.getName().toUpperCase()
+                    + ";");
         }
         s.add("");
         s.add("            tasks.push(task);");

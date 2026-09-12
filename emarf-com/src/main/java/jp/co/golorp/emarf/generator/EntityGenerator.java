@@ -75,6 +75,7 @@ public final class EntityGenerator extends BeanGenerator {
                 String t = column.getDataType(); // type
                 // p = p.replaceAll("#", "_"); a = a.replaceAll("#", "_");
                 s.add("");
+                //                s.add("    /** " + n.toUpperCase() + ":" + column.getTypeName() + ":" + column.getColumnSize() + " */");
                 s.add("    /** " + n.toUpperCase() + " */");
                 if (StringUtil.endsWith(INPUT_TS_SUFS, n)) {
                     addAnnotationLocalTimeStamp(s);
@@ -343,7 +344,8 @@ public final class EntityGenerator extends BeanGenerator {
             s.add("    private String " + p + ";");
             s.add("");
             s.add("    /** @return " + columnMei + "参照 */");
-            s.add("    @com.fasterxml.jackson.annotation.JsonProperty(value = \"" + n + "\", index = " + ++i + ")");
+            s.add("    @com.fasterxml.jackson.annotation.JsonProperty(value = \"" + n.toUpperCase() + "\", index = "
+                    + ++i + ")");
             s.add("    public String get" + a + "() {");
             s.add("        return this." + p + ";");
             s.add("    }");
